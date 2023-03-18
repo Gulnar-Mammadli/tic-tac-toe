@@ -13,6 +13,7 @@ message AccessRequest {
 
 message AccessResponse {
     string id = 1;
+    string symbol = 2;
 }
 
 message Message {
@@ -43,7 +44,6 @@ message PlayerResponse {
 }
 
 service AdminService {
-    rpc  set_symbol (PlayerRequest) returns (PlayerResponse) {}
+    rpc  start_game (PlayerRequest) returns (PlayerResponse) {}
     rpc  list_board (RequestCurrentGameboard) returns (ResponseCurrentGameboard) {}
-    rpc  PassMessage (Message) returns (Message) {}
   }
