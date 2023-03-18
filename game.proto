@@ -4,7 +4,15 @@ package tic_tac_toe;
 service PlayerService {
   rpc  set_symbol (PlayerRequest) returns (PlayerResponse) {}
   rpc  list_board (RequestCurrentGameboard) returns (ResponseCurrentGameboard) {}
-  rpc  PassMessage (Message) returns (Message) {}
+  rpc  access_to_server(AccessRequest) returns (AccessResponse)
+}
+
+message AccessRequest {
+    string name;
+}
+
+message AccessResponse {
+    string id;
 }
 
 message Message {
@@ -37,4 +45,5 @@ message PlayerResponse {
 service AdminService {
     rpc  set_symbol (PlayerRequest) returns (PlayerResponse) {}
     rpc  list_board (RequestCurrentGameboard) returns (ResponseCurrentGameboard) {}
+    rpc  PassMessage (Message) returns (Message) {}
   }
