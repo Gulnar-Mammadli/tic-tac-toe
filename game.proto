@@ -1,0 +1,26 @@
+syntax = "proto3";
+package tic_tac_toe;
+
+service PlayerService {
+  rpc  set_symbol (PlayerRequest) returns (PlayerResponse) {}
+  rpc  list_board (RequestCurrentGameboard) returns (ResponseCurrentGameboard) {}
+}
+
+message RequestCurrentGameboard {}
+
+message ResponseCurrentGameboard {
+    string updated_game_field = 1;
+}
+
+
+message PlayerRequest {
+    int32 position = 1;
+    string symbol = 2;
+    string timestamp = 3;
+}
+
+message PlayerResponse {
+    int32 position = 1;
+    string symbol = 2;
+    string timestamp = 3;
+}
