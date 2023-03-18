@@ -1,8 +1,8 @@
 import grpc
 from concurrent import futures
 
-import ring_pb2
-import ring_pb2_grpc
+import game_pb2
+import game_pb2_grpc
 
 # Increase the maximum metadata size
 options = [
@@ -11,7 +11,7 @@ options = [
 ]
 
 
-class Node(ring_pb2_grpc.RingServicer):
+class Node(game_pb2_grpc.AdminServiceServicer):
     def __init__(self, id):
         self.id = int(id)
 
@@ -20,7 +20,7 @@ class Node(ring_pb2_grpc.RingServicer):
 
     def PassMessage(self, request, context):
         print(f"Node {self.id} received message: {request}")
-        message = ring_pb2.Message()
+        message = game_pb2.Message()
         message.origin = request.origin
         message.rounds = request.rounds
         message.max_id = max(request.max_id, self.id)
@@ -41,7 +41,7 @@ class Node(ring_pb2_grpc.RingServicer):
         while True:
             try:
                 with grpc.insecure_channel(f"localhost:{self.next_node_address}") as channel:
-                    stub = ring_pb2_grpc.RingStub(channel)
+                    stub = game_pb2_grpc.AdminServiceStub(channel)
                     response = stub.PassMessage(message)
                     return response
             except grpc.RpcError as e:
@@ -59,7 +59,7 @@ def serve(id, address, next_node_address):
     node = Node(id)
     node.set_next_node(next_node_address)
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=5), options=options)
-    ring_pb2_grpc.add_RingServicer_to_server(node, server)
+    game_pb2_grpc.add_AdminServiceServicer_to_server(node, server)
     server.add_insecure_port(f"localhost:{port1}")
     server.start()
     print(f"Node {id} started at {address}. Its next node is {port2}")
