@@ -2,6 +2,7 @@ import grpc
 from concurrent import futures
 import game_pb2
 import game_pb2_grpc
+import uuid
 
 players = [None] * 2
 first_port = 50051
@@ -10,31 +11,8 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
     def __init__(self) -> None:
         super().__init__()
         self.board = [['-', '-', '-'], ['-', '-', '-'], ['-', '-', '-']]
-        # self.player1_symbol = 'X'
-        # self.player2_symbol = 'O'
-
-    def set_symbol(self, request, context):
-        request = game_pb2.PlayerRequest()
-        request_data = self.stub.set_symbol(request)
-        if request_data.symbol not in [self.player1_symbol, self.player2_symbol]:
-            context.set_details('Invalid symbol')
-            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            return game_pb2.SymbolResponse(success=False)
-        if self.current_player != request_data.symbol:
-            context.set_details('Not your turn')
-            context.set_code(grpc.StatusCode.FAILED_PRECONDITION)
-            return game_pb2.SymbolResponse(success=False)
-        if self.board[request_data.row][request_data.col] != '-':
-            context.set_details('Cell already occupied')
-            context.set_code(grpc.StatusCode.FAILED_PRECONDITION)
-            return game_pb2.SymbolResponse(success=False)
-
-        self.board[request_data.row][request_data.col] = request_data.symbol
-        if self.current_player == self.player1_symbol:
-            self.current_player = self.player2_symbol
-        else:
-            self.current_player = self.player1_symbol
-        return game_pb2.SymbolResponse(success=True)
+        self.player1_symbol = 'X'
+        self.player2_symbol = 'O'
 
 
     # draft
@@ -116,7 +94,7 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
             if not players[i]:
                 players[i] = request.name
                 id = request.name + str(i)
-                symbol = "o" if i == 0 else "x"
+                symbol = self.player1_symbol  if i == 0 else self.player2_symbol 
                 response = game_pb2.AccessResponse(id=id, symbol=symbol)
                 return response
         # If both player slots are filled, return an error response
