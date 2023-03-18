@@ -8,11 +8,11 @@ service PlayerService {
 }
 
 message AccessRequest {
-    string name;
+    string name = 1 ;
 }
 
 message AccessResponse {
-    string id;
+    string id = 1;
 }
 
 message Message {
