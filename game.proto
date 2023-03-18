@@ -23,4 +23,10 @@ message PlayerResponse {
     int32 position = 1;
     string symbol = 2;
     string timestamp = 3;
+    ResponseCurrentGameboard game_board = 4;
 }
+
+service AdminService {
+    rpc  set_symbol (PlayerRequest) returns (PlayerResponse) {}
+    rpc  list_board (RequestCurrentGameboard) returns (ResponseCurrentGameboard) {}
+  }
