@@ -141,8 +141,8 @@ class AdminServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.set_symbol = channel.unary_unary(
-                '/tic_tac_toe.AdminService/set_symbol',
+        self.start_game = channel.unary_unary(
+                '/tic_tac_toe.AdminService/start_game',
                 request_serializer=game__pb2.PlayerRequest.SerializeToString,
                 response_deserializer=game__pb2.PlayerResponse.FromString,
                 )
@@ -151,17 +151,12 @@ class AdminServiceStub(object):
                 request_serializer=game__pb2.RequestCurrentGameboard.SerializeToString,
                 response_deserializer=game__pb2.ResponseCurrentGameboard.FromString,
                 )
-        self.PassMessage = channel.unary_unary(
-                '/tic_tac_toe.AdminService/PassMessage',
-                request_serializer=game__pb2.Message.SerializeToString,
-                response_deserializer=game__pb2.Message.FromString,
-                )
 
 
 class AdminServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def set_symbol(self, request, context):
+    def start_game(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -173,17 +168,11 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def PassMessage(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
 
 def add_AdminServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'set_symbol': grpc.unary_unary_rpc_method_handler(
-                    servicer.set_symbol,
+            'start_game': grpc.unary_unary_rpc_method_handler(
+                    servicer.start_game,
                     request_deserializer=game__pb2.PlayerRequest.FromString,
                     response_serializer=game__pb2.PlayerResponse.SerializeToString,
             ),
@@ -191,11 +180,6 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     servicer.list_board,
                     request_deserializer=game__pb2.RequestCurrentGameboard.FromString,
                     response_serializer=game__pb2.ResponseCurrentGameboard.SerializeToString,
-            ),
-            'PassMessage': grpc.unary_unary_rpc_method_handler(
-                    servicer.PassMessage,
-                    request_deserializer=game__pb2.Message.FromString,
-                    response_serializer=game__pb2.Message.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -208,7 +192,7 @@ class AdminService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def set_symbol(request,
+    def start_game(request,
             target,
             options=(),
             channel_credentials=None,
@@ -218,7 +202,7 @@ class AdminService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.AdminService/set_symbol',
+        return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.AdminService/start_game',
             game__pb2.PlayerRequest.SerializeToString,
             game__pb2.PlayerResponse.FromString,
             options, channel_credentials,
@@ -238,22 +222,5 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.AdminService/list_board',
             game__pb2.RequestCurrentGameboard.SerializeToString,
             game__pb2.ResponseCurrentGameboard.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def PassMessage(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.AdminService/PassMessage',
-            game__pb2.Message.SerializeToString,
-            game__pb2.Message.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
