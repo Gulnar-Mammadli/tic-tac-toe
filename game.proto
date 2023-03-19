@@ -5,6 +5,16 @@ service PlayerService {
   rpc  set_symbol (PlayerRequest) returns (PlayerResponse) {}
   rpc  list_board (RequestCurrentGameboard) returns (ResponseCurrentGameboard) {}
   rpc  access_to_server(AccessRequest) returns (AccessResponse) {}
+  rpc  broadcastMessage(MessageRequest) returns (stream MessageResponse) {}
+}
+
+
+message MessageRequest {
+  string message = 1;
+}
+
+message MessageResponse {
+  string message = 1;
 }
 
 message AccessRequest {
