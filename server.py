@@ -3,6 +3,7 @@ import grpc
 from concurrent import futures
 import game_pb2
 import game_pb2_grpc
+import time
 
 players = [None] * 2
 board = [[None, None, None], [None, None, None], [None, None, None]]
@@ -40,16 +41,13 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         return game_pb2.SymbolResponse(success=True)
 
 
-    # draft
-    def start_game(self, request, context):
-        player_id = request.player_id
+    def start_game(self):
+        player_id = self.player_id
         if player_id in self.players:
-            return game_pb2.GameId(game_id=self.players[player_id])
-        else:
-            game_id = str(uuid.uuid4())
-            self.games[game_id] = {'board': [' '] * 9, 'next_player': 'X', 'winner': None}
-            self.players[player_id] = game_id
-            return game_pb2.GameId(game_id=game_id)
+            print(f": This is the game board. Player {player_id} , you can start playing the game")
+            self.board = {'board': [' '] * 9, 'first_player': 'X', 'winner': None}
+            return game_pb2.
+        
 
     def join_game(self, request, context):
         player_id = request.player_id
@@ -117,10 +115,10 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
     def access_to_server(self, request, context):
         for i in range(len(players)):
             if not players[i]:
-                players[i] = request.name
                 id = request.name + str(i)
                 symbol = "o" if i == 0 else "x"
                 response = game_pb2.AccessResponse(id=id, symbol=symbol)
+                players[i] = response.id
                 return response
         # If both player slots are filled, return an error response
         context.set_details('All players are already in.')
@@ -216,6 +214,11 @@ class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
                 return board[0][2]
 
             return None
+
+    def broadcastMessage(self,request,context):
+            for i in range(len(players)):
+                yield game_pb2.MessageResponse(message=f"{request.message} {i}")
+                time.sleep(1)
 
 
 
