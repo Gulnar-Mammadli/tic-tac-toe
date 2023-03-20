@@ -5,7 +5,7 @@ import game_pb2
 import game_pb2_grpc
 import time
 #import ringserver as ring
-import berkeley_utils as brkl
+import Berkeley.berkeley_utils as brkl
 
 players = [None] * 2
 board = [[None, None, None], [None, None, None], [None, None, None]]
