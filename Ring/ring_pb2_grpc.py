@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import ring_pb2 as ring__pb2
+import Ring.ring_pb2 as ring__pb2
 
 
 class RingElectionStub(object):

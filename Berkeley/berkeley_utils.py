@@ -1,7 +1,7 @@
 import datetime
 import grpc
-import berkeley_pb2
-import berkeley_pb2_grpc
+import Berkeley.berkeley_pb2
+import Berkeley.berkeley_pb2_grpc
 from config import *
 import time
 
@@ -34,8 +34,8 @@ def synchronize_time(nodes_addresses):
 def request_time_from_node(node_address):
     try:
         with grpc.insecure_channel(f"localhost:{node_address}") as channel:
-            stub = berkeley_pb2_grpc.BerkeleySynchronizationStub(channel)
-            response = stub.RequestTime(berkeley_pb2.Empty())
+            stub = Berkeley.berkeley_pb2_grpc.BerkeleySynchronizationStub(channel)
+            response = stub.RequestTime(Berkeley.berkeley_pb2.Empty())
             node_time = response.time
             local_time = time.time()
             time_difference = node_time - local_time
@@ -48,8 +48,8 @@ def request_time_from_node(node_address):
 def adjust_time_of_node(node_address, adjustment):
     try:
         with grpc.insecure_channel(f"localhost:{node_address}") as channel:
-            stub = berkeley_pb2_grpc.BerkeleySynchronizationStub(channel)
-            request = berkeley_pb2.TimeAdjustment(adjustment=int(adjustment))
+            stub = Berkeley.berkeley_pb2_grpc.BerkeleySynchronizationStub(channel)
+            request = Berkeley.berkeley_pb2.TimeAdjustment(adjustment=int(adjustment))
             stub.AdjustTime(request)
     except grpc.RpcError as e:
         print(f"Failed to adjust time of Node {node_address}. Error: {e}")

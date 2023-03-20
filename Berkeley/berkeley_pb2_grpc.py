@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import berkeley_pb2 as berkeley__pb2
+import Berkeley.berkeley_pb2 as berkeley__pb2
 
 
 class BerkeleySynchronizationStub(object):

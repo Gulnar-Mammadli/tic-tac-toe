@@ -4,7 +4,7 @@ import game_pb2
 import game_pb2_grpc
 import datetime
 import time
-import berkeley_utils as brkl
+import Berkeley.berkeley_utils as brkl
 class Client():
 
     def __init__(self) -> None:
