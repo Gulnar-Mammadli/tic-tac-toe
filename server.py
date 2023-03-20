@@ -42,11 +42,15 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
 
 
     def start_game(self):
+        #based on the document, this method includes:
+        # 1. Berkeley Clock
+        # 2. Ring Election
+        # 3. Start tic-tac-toe  
         player_id = self.player_id
         if player_id in self.players:
             print(f": This is the game board. Player {player_id} , you can start playing the game")
             self.board = {'board': [' '] * 9, 'first_player': 'X', 'winner': None}
-            return game_pb2.
+            #return game_pb2.
         
 
     def join_game(self, request, context):
