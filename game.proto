@@ -57,3 +57,5 @@ service AdminService {
     rpc  list_board (RequestCurrentGameboard) returns (ResponseCurrentGameboard) {}
     rpc  broadcastMessage(MessageRequest) returns (stream MessageResponse) {}
   }
+
+  

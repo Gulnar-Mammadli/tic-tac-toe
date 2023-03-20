@@ -1,0 +1,15 @@
+//python -m grpc_tools.protoc -I . --python_out=. --grpc_python_out=. ring.proto
+
+syntax = "proto3";
+package tic_tac_toe;
+
+service RingElection {
+    rpc StartElection(Message) returns (Message) {}
+}
+
+message Message {
+    int32 origin = 1;
+    int32 max_id = 2;
+    int32 rounds = 3;
+    int32 leader = 4;
+}
