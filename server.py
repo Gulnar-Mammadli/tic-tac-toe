@@ -4,6 +4,8 @@ from concurrent import futures
 import game_pb2
 import game_pb2_grpc
 import time
+#import ringserver as ring
+import berkeley_utils as brkl
 
 players = [None] * 2
 board = [[None, None, None], [None, None, None], [None, None, None]]
@@ -14,8 +16,8 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
     def __init__(self) -> None:
         super().__init__()
         self.board = [['-', '-', '-'], ['-', '-', '-'], ['-', '-', '-']]
-        # self.player1_symbol = 'X'
-        # self.player2_symbol = 'O'
+        self.player1_symbol = 'X'
+        self.player2_symbol = 'O'
 
     def set_symbol(self, request, context):
         request = game_pb2.PlayerRequest()
@@ -42,11 +44,15 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
 
 
     def start_game(self):
+        #based on the document, this method includes:
+        # 1. Berkeley Clock
+        # 2. Ring Election
+        # 3. Start tic-tac-toe  
         player_id = self.player_id
         if player_id in self.players:
             print(f": This is the game board. Player {player_id} , you can start playing the game")
             self.board = {'board': [' '] * 9, 'first_player': 'X', 'winner': None}
-            return game_pb2.
+            #return game_pb2.
         
 
     def join_game(self, request, context):
@@ -116,7 +122,7 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         for i in range(len(players)):
             if not players[i]:
                 id = request.name + str(i)
-                symbol = "o" if i == 0 else "x"
+                symbol = self.player2_symbol if i == 0 else self.player1_symbol 
                 response = game_pb2.AccessResponse(id=id, symbol=symbol)
                 players[i] = response.id
                 return response
@@ -128,21 +134,11 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
 
   
 
-#admin = AdminServiceServicer()
-player = PlayerServiceServicer()
-def serve():
-    #admin.waiting_for_players()
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
-    game_pb2_grpc.add_PlayerServiceServicer_to_server(player, server)
-    server.add_insecure_port(f'[::]:{first_port}')
 
 
-    server.start()
-    print(f'Starting server. Listening on port {first_port}.')
-
-    server.wait_for_termination()
 
 
+        
 class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
     def __init__(self) -> None:
         super().__init__()
@@ -223,7 +219,21 @@ class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
 
 
 
+admin = AdminServiceServicer()
+player = PlayerServiceServicer()
 
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
+    game_pb2_grpc.add_PlayerServiceServicer_to_server(player, server)
+    game_pb2_grpc.add_AdminServiceServicer_to_server(admin, server)
+    server.add_insecure_port(f'[::]:{first_port}')
+
+    admin.waiting_for_players()
+
+    server.start()
+    print(f'Starting server. Listening on port {first_port}.')
+
+    server.wait_for_termination()
 
 if __name__ == "__main__":
         serve()

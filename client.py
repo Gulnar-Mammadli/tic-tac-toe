@@ -3,7 +3,8 @@ import random
 import game_pb2
 import game_pb2_grpc
 import datetime
-
+import time
+import berkeley_utils as brkl
 class Client():
 
     def __init__(self) -> None:
@@ -43,4 +44,8 @@ class Client():
 if __name__ == "__main__": 
         a = Client()
         a.access_to_server()
-        a.set_symbol()    
+
+        start_time = time.time()
+        while (time.time() - start_time) < 3600:  # run for 1 hour (3600 seconds)
+            
+            time.sleep(1)  # add a delay to reduce CPU usage 
