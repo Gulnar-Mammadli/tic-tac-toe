@@ -16,6 +16,8 @@ class Client():
         self.stub2 = game_pb2_grpc.AdminServiceStub(self.channel)
         self.reg_timestamp = str(datetime.datetime.now())
         self.total_processes = 3
+        self.clients = set()
+
     def access_to_server(self):
     
         # with grpc.insecure_channel(f"{serverip}:{first_port}") as channel:
@@ -38,6 +40,20 @@ class Client():
         response_iterator = self.stub2.BroadcastMessage(msg)
         for response in response_iterator:
             print(response.message)
+
+# broadcasting example
+    def SayHello(self, request_iterator, context):
+        for client in self.clients:
+            yield hello_pb2.HelloReply(message="Server: Hello, {}!".format(client))
+
+        for request in request_iterator:
+                yield hello_pb2.HelloReply(message="Server: Hello, {}!".format(request.name))  
+                     
+# broadcasting example
+    def Register(self, request, context):
+        self.clients.add(request.name)
+        print("Client {} registered".format(request.name))
+        return hello_pb2.Empty() 
 
     # first_port = 50051
 
