@@ -19,24 +19,7 @@ class Client():
         self.stub2 = game_pb2_grpc.AdminServiceStub(self.channel)
         self.reg_timestamp = str(datetime.datetime.now())
         self.total_processes = 3
-
-
-    async def player_task(self):
-        self.stub1 = game_pb2_grpc.PlayerServiceStub(self.channel)
-        response = await self.stub1.player_request(game_pb2.AccessRequest(name =self.reg_name))  
-        self.reg_symbol = response.symbol
-        print(f"your id: {response.id} symbol {response.symbol}")
-
-    async def list_board_async(self):
-        response = await self.stub2.list_board(game_pb2.GameEmpty())
-        print(response.message)
-    # async def admin_task(self):
-    #     self.stub2 = game_pb2_grpc.AdminServiceStub(self.channel)
-    #     response = await self.stub2.admin_request(game_pb2.AdminRequest())
-    #     print(response.message)
-
-    async def run_tasks(self):
-        await asyncio.gather(self.player_task())
+        self.clients = set()
 
     def access_to_server(self):
             request = game_pb2.AccessRequest()
@@ -52,6 +35,30 @@ class Client():
             request.timestamp = self.reg_timestamp
             self.stub2.start_game(request)
 
+    def broadcastMessage(self):
+        msg = game_pb2.MessageRequest(message = "hi")
+        response_iterator = self.stub2.BroadcastMessage(msg)
+        for response in response_iterator:
+            print(response.message)
+
+# broadcasting example
+    def SendMessage(self, request_iterator, context):
+        msg = game_pb2.MessageRequest(message = "hey")
+        for client in self.clients:
+            yield game_pb2.MessageResponse(msg.format(client))
+            # yield hello_pb2.HelloReply(message="Server: Hello, {}!".format(client))
+
+        for request in request_iterator:
+            yield game_pb2.MessageResponse(msg.format(request.name))
+                # yield hello_pb2.HelloReply(message="Server: Hello, {}!".format(request.name))  
+
+# broadcasting example
+    def Register(self, request, context):
+        self.clients.add(request.name)
+        print("Client {} registered".format(request.name))
+        return game_pb2.Empty() 
+
+    # first_port = 50051
 
 if __name__ == "__main__": 
     a = Client()
