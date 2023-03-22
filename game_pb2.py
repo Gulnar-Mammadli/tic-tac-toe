@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ngame.proto\x12\x0btic_tac_toe\"!\n\x0eMessageRequest\x12\x0f\n\x07message\x18\x01 \x01(\t\"\"\n\x0fMessageResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x1d\n\rAccessRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\",\n\x0e\x41\x63\x63\x65ssResponse\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06symbol\x18\x02 \x01(\t\"I\n\x07Message\x12\x0e\n\x06origin\x18\x01 \x01(\x05\x12\x0e\n\x06max_id\x18\x02 \x01(\x05\x12\x0e\n\x06rounds\x18\x03 \x01(\x05\x12\x0e\n\x06leader\x18\x04 \x01(\x05\"\x0b\n\tGameEmpty\"D\n\rPlayerRequest\x12\x10\n\x08position\x18\x01 \x01(\x05\x12\x0e\n\x06symbol\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\t\"Y\n\x0ePlayerResponse\x12\x10\n\x08position\x18\x01 \x01(\x05\x12\x0e\n\x06symbol\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\t\x12\x12\n\ngame_board\x18\x04 \x01(\t2\xf4\x01\n\rPlayerService\x12K\n\x0eplayer_request\x12\x1a.tic_tac_toe.AccessRequest\x1a\x1b.tic_tac_toe.AccessResponse\"\x00\x12G\n\nset_symbol\x12\x1a.tic_tac_toe.PlayerRequest\x1a\x1b.tic_tac_toe.PlayerResponse\"\x00\x12M\n\x10\x61\x63\x63\x65ss_to_server\x12\x1a.tic_tac_toe.AccessRequest\x1a\x1b.tic_tac_toe.AccessResponse\"\x00\x32\xb9\x02\n\x0c\x41\x64minService\x12G\n\radmin_request\x12\x16.tic_tac_toe.GameEmpty\x1a\x1c.tic_tac_toe.MessageResponse\"\x00\x12G\n\nstart_game\x12\x1a.tic_tac_toe.PlayerRequest\x1a\x1b.tic_tac_toe.PlayerResponse\"\x00\x12\x44\n\nlist_board\x12\x16.tic_tac_toe.GameEmpty\x1a\x1c.tic_tac_toe.MessageResponse\"\x00\x12Q\n\x10\x62roadcastMessage\x12\x1b.tic_tac_toe.MessageRequest\x1a\x1c.tic_tac_toe.MessageResponse\"\x00\x30\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\ngame.proto\x12\x0btic_tac_toe\"!\n\x0eMessageRequest\x12\x0f\n\x07message\x18\x01 \x01(\t\"\"\n\x0fMessageResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x1d\n\rAccessRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\"A\n\x0e\x41\x63\x63\x65ssResponse\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06symbol\x18\x02 \x01(\t\x12\x13\n\x0bgame_status\x18\x03 \x01(\t\"I\n\x07Message\x12\x0e\n\x06origin\x18\x01 \x01(\x05\x12\x0e\n\x06max_id\x18\x02 \x01(\x05\x12\x0e\n\x06rounds\x18\x03 \x01(\x05\x12\x0e\n\x06leader\x18\x04 \x01(\x05\"\x0b\n\tGameEmpty\"D\n\rPlayerRequest\x12\x10\n\x08position\x18\x01 \x01(\x05\x12\x0e\n\x06symbol\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\t\"Y\n\x0ePlayerResponse\x12\x10\n\x08position\x18\x01 \x01(\x05\x12\x0e\n\x06symbol\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\t\x12\x12\n\ngame_board\x18\x04 \x01(\t2\xbb\x02\n\rPlayerService\x12K\n\x0eplayer_request\x12\x1a.tic_tac_toe.AccessRequest\x1a\x1b.tic_tac_toe.AccessResponse\"\x00\x12G\n\nset_symbol\x12\x1a.tic_tac_toe.PlayerRequest\x1a\x1b.tic_tac_toe.PlayerResponse\"\x00\x12M\n\x10\x61\x63\x63\x65ss_to_server\x12\x1a.tic_tac_toe.AccessRequest\x1a\x1b.tic_tac_toe.AccessResponse\"\x00\x12\x45\n\x06logout\x12\x1b.tic_tac_toe.MessageRequest\x1a\x1c.tic_tac_toe.MessageResponse\"\x00\x32\xb9\x02\n\x0c\x41\x64minService\x12G\n\radmin_request\x12\x16.tic_tac_toe.GameEmpty\x1a\x1c.tic_tac_toe.MessageResponse\"\x00\x12G\n\nstart_game\x12\x1a.tic_tac_toe.PlayerRequest\x1a\x1b.tic_tac_toe.PlayerResponse\"\x00\x12\x44\n\nlist_board\x12\x16.tic_tac_toe.GameEmpty\x1a\x1c.tic_tac_toe.MessageResponse\"\x00\x12Q\n\x10\x62roadcastMessage\x12\x1b.tic_tac_toe.MessageRequest\x1a\x1c.tic_tac_toe.MessageResponse\"\x00\x30\x01\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'game_pb2', globals())
@@ -27,17 +27,17 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _ACCESSREQUEST._serialized_start=98
   _ACCESSREQUEST._serialized_end=127
   _ACCESSRESPONSE._serialized_start=129
-  _ACCESSRESPONSE._serialized_end=173
-  _MESSAGE._serialized_start=175
-  _MESSAGE._serialized_end=248
-  _GAMEEMPTY._serialized_start=250
-  _GAMEEMPTY._serialized_end=261
-  _PLAYERREQUEST._serialized_start=263
-  _PLAYERREQUEST._serialized_end=331
-  _PLAYERRESPONSE._serialized_start=333
-  _PLAYERRESPONSE._serialized_end=422
-  _PLAYERSERVICE._serialized_start=425
-  _PLAYERSERVICE._serialized_end=669
-  _ADMINSERVICE._serialized_start=672
-  _ADMINSERVICE._serialized_end=985
+  _ACCESSRESPONSE._serialized_end=194
+  _MESSAGE._serialized_start=196
+  _MESSAGE._serialized_end=269
+  _GAMEEMPTY._serialized_start=271
+  _GAMEEMPTY._serialized_end=282
+  _PLAYERREQUEST._serialized_start=284
+  _PLAYERREQUEST._serialized_end=352
+  _PLAYERRESPONSE._serialized_start=354
+  _PLAYERRESPONSE._serialized_end=443
+  _PLAYERSERVICE._serialized_start=446
+  _PLAYERSERVICE._serialized_end=761
+  _ADMINSERVICE._serialized_start=764
+  _ADMINSERVICE._serialized_end=1077
 # @@protoc_insertion_point(module_scope)

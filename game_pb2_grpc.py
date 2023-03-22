@@ -29,6 +29,11 @@ class PlayerServiceStub(object):
                 request_serializer=game__pb2.AccessRequest.SerializeToString,
                 response_deserializer=game__pb2.AccessResponse.FromString,
                 )
+        self.logout = channel.unary_unary(
+                '/tic_tac_toe.PlayerService/logout',
+                request_serializer=game__pb2.MessageRequest.SerializeToString,
+                response_deserializer=game__pb2.MessageResponse.FromString,
+                )
 
 
 class PlayerServiceServicer(object):
@@ -52,6 +57,12 @@ class PlayerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def logout(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_PlayerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -69,6 +80,11 @@ def add_PlayerServiceServicer_to_server(servicer, server):
                     servicer.access_to_server,
                     request_deserializer=game__pb2.AccessRequest.FromString,
                     response_serializer=game__pb2.AccessResponse.SerializeToString,
+            ),
+            'logout': grpc.unary_unary_rpc_method_handler(
+                    servicer.logout,
+                    request_deserializer=game__pb2.MessageRequest.FromString,
+                    response_serializer=game__pb2.MessageResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -128,6 +144,23 @@ class PlayerService(object):
         return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.PlayerService/access_to_server',
             game__pb2.AccessRequest.SerializeToString,
             game__pb2.AccessResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def logout(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.PlayerService/logout',
+            game__pb2.MessageRequest.SerializeToString,
+            game__pb2.MessageResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

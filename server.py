@@ -34,27 +34,6 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
     def __init__(self):
         self.player1_symbol = 'X'
         self.player2_symbol = 'O'
-
-    async def list_board_async(self):
-        async with grpc.aio.insecure_channel(f'{ip}:{first_port}') as channel:
-            stub = game_pb2_grpc.AdminServiceStub(channel)
-            response = await stub.list_board(game_pb2.GameEmpty())
-            print(response.message)
-
-    async def player_request(self, request, context):
-        for i in range(len(players)):
-            if not players[i]:
-                id = request.name + str(i)
-                symbol = self.player2_symbol if i == 0 else self.player1_symbol 
-                response = game_pb2.AccessResponse(id=id, symbol=symbol)
-                players[i] = response.id
-                await self.list_board_async() # Replace this with your actual async method call
-                return response
-
-        # If both player slots are filled, return an error response
-        context.set_details('All players are already in.')
-        context.set_code(grpc.StatusCode.UNAVAILABLE)
-        return game_pb2.AccessResponse()
     
     def set_symbol(self, request, context):
         request = game_pb2.PlayerRequest()
@@ -156,10 +135,14 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
     def access_to_server(self, request, context):
         for i in range(len(players)):
             if not players[i]:
+                sttatus = "wait for another player" if i == 0 else "both you and another player are in. Game should start soon"
                 id = request.name + str(i)
                 symbol = self.player2_symbol if i == 0 else self.player1_symbol 
-                response = game_pb2.AccessResponse(id=id, symbol=symbol)
+                response = game_pb2.AccessResponse(id=id, symbol=symbol,game_status = sttatus)
                 players[i] = response.id
+                print(f"{players[i]} has joined the game.")
+
+
                 return response
         # If both player slots are filled, return an error response
         context.set_details('All players are already in.')
@@ -171,8 +154,8 @@ class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
         super().__init__()
 
     def waiting_for_players(self):
-        print(f"waiting at port {first_port}")
-
+        return (f"waiting for another player at port {first_port}")
+ 
     # def start_game(self, request, context):
     #         response = game_pb2.MessageResponse(board=game_board)
     #         return response
@@ -186,10 +169,10 @@ class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
                 time.sleep(1)
     
     def list_board0(self):
-        with grpc.insecure_channel(f'{ip}:{first_port}') as channel:
+        with grpc.insecure_channel(f'[::]:{first_port}') as channel:
             stub = game_pb2_grpc.AdminServiceStub(channel)
             response = stub.list_board(game_pb2.GameEmpty())
-            print(response.message)
+            return response.message
 
     def list_board(self, request, context):
         return game_pb2.MessageResponse(message = printGameBoard())
@@ -203,13 +186,13 @@ def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
     game_pb2_grpc.add_PlayerServiceServicer_to_server(player, server)
     game_pb2_grpc.add_AdminServiceServicer_to_server(admin, server)
-    server.add_insecure_port(f'{ip_address}:{first_port}')
+    server.add_insecure_port(f'[::]:{first_port}')
 
     # admin.waiting_for_players()
 
     server.start()
     print(f'Starting server. Listening on port {ip_address}:{first_port}.')
-    # admin.list_board0()
+    admin.list_board0()
 
     server.wait_for_termination()
 

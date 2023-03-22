@@ -10,7 +10,7 @@ print(f"Hostname: {hostname}")
 print(f"IP Address: {ip_address}")
 
 total_processes = 3
-ip = "192.168.246.255"
+ip = "172.80.0.1"
 first_port = 50051
 last_port = first_port + total_processes -1
 nodes_addresses = [first_port + i for i in range(total_processes)]

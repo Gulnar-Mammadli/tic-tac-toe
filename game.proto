@@ -7,6 +7,8 @@ service PlayerService {
   rpc  player_request (AccessRequest) returns (AccessResponse) {}
   rpc  set_symbol (PlayerRequest) returns (PlayerResponse) {}
   rpc  access_to_server(AccessRequest) returns (AccessResponse) {}
+  rpc  logout(MessageRequest) returns(MessageResponse){}
+
 }
 
 
@@ -25,6 +27,8 @@ message AccessRequest {
 message AccessResponse {
     string id = 1;
     string symbol = 2;
+    string game_status = 3;
+
 }
 
 message Message {
