@@ -42,18 +42,21 @@ class Client():
             print(response.message)
 
 # broadcasting example
-    def SayHello(self, request_iterator, context):
+    def SendMessage(self, request_iterator, context):
+        msg = game_pb2.MessageRequest(message = "hey")
         for client in self.clients:
-            yield hello_pb2.HelloReply(message="Server: Hello, {}!".format(client))
+            yield game_pb2.MessageResponse(msg.format(client))
+            # yield hello_pb2.HelloReply(message="Server: Hello, {}!".format(client))
 
         for request in request_iterator:
-                yield hello_pb2.HelloReply(message="Server: Hello, {}!".format(request.name))  
-                     
+            yield game_pb2.MessageResponse(msg.format(request.name))
+                # yield hello_pb2.HelloReply(message="Server: Hello, {}!".format(request.name))  
+
 # broadcasting example
     def Register(self, request, context):
         self.clients.add(request.name)
         print("Client {} registered".format(request.name))
-        return hello_pb2.Empty() 
+        return game_pb2.Empty() 
 
     # first_port = 50051
 
