@@ -1,3 +1,4 @@
+from config import *
 import uuid
 import grpc
 from concurrent import futures
@@ -5,20 +6,56 @@ import game_pb2
 import game_pb2_grpc
 import time
 #import ringserver as ring
-import Berkeley.berkeley_utils as brkl
+#import Berkeley.berkeley_utils as brkl
 
 players = [None] * 2
 board = [[None, None, None], [None, None, None], [None, None, None]]
 current_player = 0
-first_port = 50051
+
+game_board = {'1': ' ' , '2': ' ' , '3': ' ' ,
+              '4': ' ' , '5': ' ' , '6': ' ' ,
+              '7': ' ' , '8': ' ' , '9': ' '}
+
+keys = []
+
+for i in game_board:
+    keys.append(i)
+
+def printGameBoard(board = game_board):
+    game_board = board['1'] + '|' + board['2'] + '|' + board['3'] + '\n'
+    game_board += '-+-+-\n'
+    game_board += board['4'] + '|' + board['5'] + '|' + board['6'] + '\n'
+    game_board += '-+-+-\n'
+    game_board += board['7'] + '|' + board['8'] + '|' + board['9'] + '\n'
+    return game_board
+
 
 class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
-    def __init__(self) -> None:
-        super().__init__()
-        self.board = [['-', '-', '-'], ['-', '-', '-'], ['-', '-', '-']]
+    def __init__(self):
         self.player1_symbol = 'X'
         self.player2_symbol = 'O'
 
+    async def list_board_async(self):
+        async with grpc.aio.insecure_channel(f'{ip}:{first_port}') as channel:
+            stub = game_pb2_grpc.AdminServiceStub(channel)
+            response = await stub.list_board(game_pb2.GameEmpty())
+            print(response.message)
+
+    async def player_request(self, request, context):
+        for i in range(len(players)):
+            if not players[i]:
+                id = request.name + str(i)
+                symbol = self.player2_symbol if i == 0 else self.player1_symbol 
+                response = game_pb2.AccessResponse(id=id, symbol=symbol)
+                players[i] = response.id
+                await self.list_board_async() # Replace this with your actual async method call
+                return response
+
+        # If both player slots are filled, return an error response
+        context.set_details('All players are already in.')
+        context.set_code(grpc.StatusCode.UNAVAILABLE)
+        return game_pb2.AccessResponse()
+    
     def set_symbol(self, request, context):
         request = game_pb2.PlayerRequest()
         request_data = self.stub.set_symbol(request)
@@ -113,11 +150,9 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         else:
             game['next_player'] = 'O' if game['next_player'] == 'X' else 'X'
             return game_pb2.MoveResult(result=game_pb2.MoveResult.CONTINUE)
-
-    def list_board(self, request, context):
-        board_str = '\n'.join([' '.join(row) for row in self.board])
-        return game_pb2.BoardResponse(board=board_str)
     
+
+
     def access_to_server(self, request, context):
         for i in range(len(players)):
             if not players[i]:
@@ -130,14 +165,6 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         context.set_details('All players are already in.')
         context.set_code(grpc.StatusCode.UNAVAILABLE)
         return game_pb2.AccessResponse()
-
-
-  
-
-
-
-
-
         
 class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
     def __init__(self) -> None:
@@ -146,76 +173,26 @@ class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
     def waiting_for_players(self):
         print(f"waiting at port {first_port}")
 
-    def list_board(self, request, context):
-        pass
-
-
-    def start_game(self, request, context):
-            # Check if both players have joined
-            if None in players:
-                context.set_details('Waiting for players to join.')
-                context.set_code(grpc.StatusCode.UNAVAILABLE)
-                return game_pb2.GameResponse()
-
-            # Check if the current player is allowed to make a move
-            if players[current_player] != request.id[:-1]:
-                context.set_details('It is not your turn.')
-                context.set_code(grpc.StatusCode.PERMISSION_DENIED)
-                return game_pb2.GameResponse()
-
-            # Check if the requested move is valid
-            row, col = int(request.move[0]), int(request.move[1])
-            if board[row][col] is not None:
-                context.set_details('Invalid move.')
-                context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-                return game_pb2.GameResponse()
-
-            # Update the game board
-            board[row][col] = players[current_player]
-
-            # Check if the current player has won
-            # winner = check_winner()
-            # if winner:
-            #     response = game_pb2.GameResponse(result=winner + ' wins!')
-            #     # self.reset_game()
-            #     return response
-
-            # # Check if the game has ended in a tie
-            # if self.check_tie():
-            #     response = game_pb2.GameResponse(result='Tie game.')
-            #     self.reset_game()
-            #     return response
-
-            # Update the current player and return the game board
-            current_player = 1 - current_player
-            board_str = '\n'.join([' '.join(row) for row in board])
-            response = game_pb2.GameResponse(board=board_str)
-            return response
+    # def start_game(self, request, context):
+    #         response = game_pb2.MessageResponse(board=game_board)
+    #         return response
 
     def check_winner(self):
-            # Check rows
-            for row in board:
-                if row[0] == row[1] == row[2] and row[0] is not None:
-                    return row[0]
-
-            # Check columns
-            for col in range(3):
-                if board[0][col] == board[1][col] == board[2][col] and board[0][col] is not None:
-                    return board[0][col]
-
-            # Check diagonals
-            if board[0][0] == board[1][1] == board[2][2] and board[0][0] is not None:
-                return board[0][0]
-            if board[0][2] == self.board[1][1] == board[2][0] and board[0][2] is not None:
-                return board[0][2]
-
-            return None
+        pass
 
     def broadcastMessage(self,request,context):
             for i in range(len(players)):
                 yield game_pb2.MessageResponse(message=f"{request.message} {i}")
                 time.sleep(1)
+    
+    def list_board0(self):
+        with grpc.insecure_channel(f'{ip}:{first_port}') as channel:
+            stub = game_pb2_grpc.AdminServiceStub(channel)
+            response = stub.list_board(game_pb2.GameEmpty())
+            print(response.message)
 
+    def list_board(self, request, context):
+        return game_pb2.MessageResponse(message = printGameBoard())
 
 
 
@@ -226,19 +203,15 @@ def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
     game_pb2_grpc.add_PlayerServiceServicer_to_server(player, server)
     game_pb2_grpc.add_AdminServiceServicer_to_server(admin, server)
-    server.add_insecure_port(f'[::]:{first_port}')
+    server.add_insecure_port(f'{ip_address}:{first_port}')
 
-    admin.waiting_for_players()
+    # admin.waiting_for_players()
 
     server.start()
-    print(f'Starting server. Listening on port {first_port}.')
+    print(f'Starting server. Listening on port {ip_address}:{first_port}.')
+    # admin.list_board0()
 
     server.wait_for_termination()
 
 if __name__ == "__main__":
         serve()
-        
-        # player_id = request.player_id
-        # game_id = self.players.get(player_id)
-        # if game_id is None:
-        #     context.set

@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import Berkeley.berkeley_pb2 as berkeley__pb2
+import berkeley_pb2 as berkeley__pb2
 
 
 class BerkeleySynchronizationStub(object):
@@ -15,12 +15,12 @@ class BerkeleySynchronizationStub(object):
             channel: A grpc.Channel.
         """
         self.RequestTime = channel.unary_unary(
-                '/tic_tac_toe.BerkeleySynchronization/RequestTime',
+                '/BerkeleySynchronization/RequestTime',
                 request_serializer=berkeley__pb2.Empty.SerializeToString,
                 response_deserializer=berkeley__pb2.TimeResponse.FromString,
                 )
         self.AdjustTime = channel.unary_unary(
-                '/tic_tac_toe.BerkeleySynchronization/AdjustTime',
+                '/BerkeleySynchronization/AdjustTime',
                 request_serializer=berkeley__pb2.TimeAdjustment.SerializeToString,
                 response_deserializer=berkeley__pb2.Empty.FromString,
                 )
@@ -56,7 +56,7 @@ def add_BerkeleySynchronizationServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'tic_tac_toe.BerkeleySynchronization', rpc_method_handlers)
+            'BerkeleySynchronization', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -75,7 +75,7 @@ class BerkeleySynchronization(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.BerkeleySynchronization/RequestTime',
+        return grpc.experimental.unary_unary(request, target, '/BerkeleySynchronization/RequestTime',
             berkeley__pb2.Empty.SerializeToString,
             berkeley__pb2.TimeResponse.FromString,
             options, channel_credentials,
@@ -92,7 +92,7 @@ class BerkeleySynchronization(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.BerkeleySynchronization/AdjustTime',
+        return grpc.experimental.unary_unary(request, target, '/BerkeleySynchronization/AdjustTime',
             berkeley__pb2.TimeAdjustment.SerializeToString,
             berkeley__pb2.Empty.FromString,
             options, channel_credentials,
