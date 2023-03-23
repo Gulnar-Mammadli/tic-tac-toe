@@ -42,11 +42,11 @@ class Client():
         response = self.stub2.list_board(request)
         print(f"{response.message}")
          
-    def set_symbol(self, pos):
+    def set_symbol(self, pos, diff):
         request = game_pb2.PlayerRequest()
         request.position = int(pos)
         request.symbol = self.reg_symbol
-        request.timestamp = self.reg_timestamp
+        request.timestamp = diff
         response = self.stub1.set_symbol(request)
         self.found_winner = response.victory
         print(response.symbol)
@@ -78,7 +78,6 @@ class Client():
             decision_time = int(difference)
             if decision_time > 60:
                 print("You took lots of time to decide.You lost your turn")
-                break
             if cmd == "quit":
                 self.logout()
                 sleep(1)
@@ -87,7 +86,7 @@ class Client():
                 if self.found_winner:
                     print("we already have a winner!")
                     return
-                self.set_symbol(cmd)
+                self.set_symbol(cmd, decision_time)
             elif cmd == "":
                 pass
             else:

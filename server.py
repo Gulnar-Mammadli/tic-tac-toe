@@ -45,10 +45,17 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
     def set_symbol(self, request, context):
         pos = 0
         sym = request.symbol
-        timpstp = ""
+        timpstp = request.timestamp
+
+        if timpstp > 60:
+            pos = -2
+            board = f"timeout" 
+            self.current_turn = self.player2_symbol if self.current_turn == self.player1_symbol else self.player1_symbol
+
         if(self.current_turn != sym):
             pos = -1
             board = f"it's not your turn. please wait {sym}"
+        
         else:
             global game_board
             if game_board[request.position] == ' ':
