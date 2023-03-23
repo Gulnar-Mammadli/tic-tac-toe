@@ -4,6 +4,7 @@ import game_pb2
 import game_pb2_grpc
 import datetime
 from config import *
+import time 
 
 #import Berkeley.berkeley_utils as brkl
 class Client():
@@ -46,7 +47,17 @@ class Client():
         request.position = int(pos)
         request.symbol = self.reg_symbol
         request.timestamp = self.reg_timestamp
+
+        start = time.time()
         response = self.stub1.set_symbol(request)
+        end = time.time()
+        difference = end - start
+        decision_time = int(difference)
+        if decision_time > 60:
+            response.symbol = ''
+            response.position = ''
+            response.game_board = ''
+
         self.found_winner = response.victory
         print(response.symbol)
         print(response.position)
