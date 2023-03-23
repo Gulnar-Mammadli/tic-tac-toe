@@ -48,7 +48,7 @@ class Client():
          
     def set_symbol(self, pos, diff):
         request = game_pb2.PlayerRequest()
-        request.position = int(pos)
+        request.position = int(pos[0])
         request.symbol = self.reg_symbol
         request.timestamp = str(diff)
         response = self.stub1.set_symbol(request)

@@ -139,6 +139,8 @@ class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
     def list_board0(self):
         print(printGameBoard())
 
+    def list_board(self, request, context):
+        return game_pb2.MessageResponse(message = printGameBoard())
 admin = AdminServiceServicer()
 player = PlayerServiceServicer()
 
