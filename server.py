@@ -59,6 +59,7 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
                 board = printGameBoard()
                 if self.check_victory(sym,pos): 
                     sym = f"{request.symbol} WON!!"
+                print(admin.list_board0())
             else:   
                 pos = -1
                 board = f"{request.position} is invalid position. use other number instead"

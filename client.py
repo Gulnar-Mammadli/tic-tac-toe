@@ -9,7 +9,7 @@ from config import *
 class Client():
 
     def __init__(self) -> None:
-        self.serverip = "localhost"  # input("paste ip here:")
+        self.serverip = "192.168.246.190"  # input("paste ip here:")
         self.reg_name = input("put your name here:")
         self.channel= grpc.insecure_channel(f'{self.serverip}:{first_port}')
         self.stub1 = game_pb2_grpc.PlayerServiceStub(self.channel)
@@ -78,7 +78,7 @@ class Client():
             elif cmd[0].isdigit():
                 if self.found_winner:
                     print("we already have a winner!")
-                    return
+                    break
                 self.set_symbol(cmd)
             elif cmd == "":
                 pass
