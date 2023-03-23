@@ -54,24 +54,34 @@ class Client():
         print(response.position)
         print(response.game_board)
 
+
+
     def check_status(self):
         request = game_pb2.GameEmpty()
         response = self.stub1.check_status(request)
         print(response.message)
+
+    def check_winner(self):
+        if self.found_winner == True:
+            print(f"{self.found_winner} found winner")
+        else:
+            print(f"{self.found_winner} no winner")
+        return self.found_winner
+
 
     def get_cmd(self):
 
         commands = {
         "board": self.list_board,
         "status": lambda: self.check_status,
+        "": lambda: self.list_board,
         "countdown": lambda: print("countdown time:"),
         }
         while(True):
-            # if self.found_winner == True:
-            #     print("We have a winner!")
-            #     return
-            # else:
-            #     print(self.found_winner + "found winner")
+
+            if (self.check_winner()):
+                break
+
             start = time.time()    
             cmd = input("Type your command to the game master: ")
             end = time.time()
@@ -85,17 +95,14 @@ class Client():
                 sleep(1)
                 break
             elif cmd[0].isdigit():
-                if self.found_winner:
-                    print("we already have a winner!")
+                if (self.check_winner()):
                     return
                 self.set_symbol(cmd, decision_time)
-            elif cmd == "":
-                pass
             else:
                 action = commands.get(cmd, lambda: print("No command found"))
                 action()
 
-        #self.logout()
+        self.logout()
 
     
 def list_tutorial():
@@ -125,7 +132,5 @@ if __name__ == "__main__":
         print("you quit the game.")
         a.logout()
         sleep(1)
-    except:
-        pass
 
 
