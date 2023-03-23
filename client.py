@@ -65,22 +65,28 @@ class Client():
         "countdown": lambda: print("countdown time:"),
         }
         while(True):
+            # if self.found_winner == True:
+            #     print("We have a winner!")
+            #     return
+            # else:
+            #     print(self.found_winner + "found winner")
             cmd = input("Type your command to the game master: ")
             if cmd == "quit":
                 self.logout()
-
                 sleep(1)
                 break
             elif cmd[0].isdigit():
                 if self.found_winner:
                     print("we already have a winner!")
-                    break
+                    return
                 self.set_symbol(cmd)
             elif cmd == "":
                 pass
             else:
                 action = commands.get(cmd, lambda: print("No command found"))
                 action()
+
+        self.logout()
 
     
 def list_tutorial():
