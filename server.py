@@ -1,5 +1,4 @@
 from config import *
-import uuid
 import grpc
 from concurrent import futures
 import game_pb2
@@ -9,6 +8,7 @@ import time
 #import Berkeley.berkeley_utils as brkl
 
 players = [None] * 2
+players_ingame = [False] * 2
 player_count = 0
 
 game_board = {1: ' ' , 2: ' ' , 3: ' ' ,
@@ -41,29 +41,53 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         self.player1_symbol = 'X'
         self.player2_symbol = 'O'
         self.current_turn = self.player2_symbol
-        board =""
+        self.board =""
+        self.found_winner = False
+        self.counter = 0
+        self.winner = ""
+
     def set_symbol(self, request, context):
         pos = 0
         sym = request.symbol
-        timpstp = ""
+        timpstp = request.timestamp
+
+        global players_ingame
+        if players_ingame[0] == False or players_ingame[1] == False:
+            pos = -1
+            board = f"wait for another player"
+        if int(timpstp) > time_limit:
+            pos = -2
+            board = f"timeout" 
+            self.current_turn = self.player2_symbol if self.current_turn == self.player1_symbol else self.player1_symbol
+
         if(self.current_turn != sym):
             pos = -1
             board = f"it's not your turn. please wait {sym}"
+
         else:
+            if self.counter >= 9:
+                self.found_winner = False 
+                sym = f"TIE!!"
+                board = printGameBoard()
             global game_board
             if game_board[request.position] == ' ':
-                
+                self.counter += 1
                 pos = request.position
                 game_board[pos] = sym
                 self.current_turn = self.player2_symbol if self.current_turn == self.player1_symbol else self.player1_symbol
                 board = printGameBoard()
-                if self.check_victory(sym,pos): 
+                if self.check_victory(sym,pos):
+                    self.found_winner = True 
+                    self.winner = request.symbol
                     sym = f"{request.symbol} WON!!"
-                print(admin.list_board0())
+                    players_ingame= [False for _ in players_ingame]
+                print(board)
             else:   
                 pos = -1
                 board = f"{request.position} is invalid position. use other number instead"
-        response = game_pb2.PlayerResponse(position=pos, symbol=sym,timestamp = "", game_board =board, victory = self.check_victory(sym,pos))
+        response = game_pb2.PlayerResponse(position=pos, symbol=sym,timestamp = "", game_board =board, victory = self.found_winner)
+        
+
         return response
     
     def check_victory(self, player_symbol, pos):
@@ -73,7 +97,29 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
                 return True
         return False
 
+    def reset_data(self):
+        for key in keys:
+            game_board[key] = " "
+        self.current_turn = self.player2_symbol
+        self.board =""
+        self.found_winner = False
+        self.counter = 0
+        self.winner = ""
+        global players_ingame
+        players_ingame[0] = False
+        players_ingame[1] = False
 
+    def restart(self, request, context):
+        self.reset_data()
+        global players_ingame
+        players_ingame[int(request.name[-1])] = True
+        response = game_pb2.AccessResponse()
+        response.id = request.name
+        response.symbol = self.player2_symbol if request.name[-1] == "0" else self.player1_symbol
+        response.game_status = "wait for another player" if players_ingame[0] == True and players_ingame[1] == True else "both you and another player are in"
+        print(f"{request.name} REQUESTS RESTART GAME")
+        return response
+    
     def start_game(self):
         #based on the document, this method includes:
         # 1. Berkeley Clock
@@ -89,8 +135,11 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         left = f"{request.message} has left the game"
         print(left)
         if request.message  in players:
+            global players_ingame
             index = players.index(request.message)
             players[index] = None
+            players_ingame[index] = False
+        global player_count
         player_count -= 1
         response = game_pb2.MessageResponse(message = left)
         return response
@@ -100,11 +149,12 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
             if not players[i]:
                 global player_count
                 player_count += 1 
-                sttatus = "wait for another player" if player_count == 1 else "both you and another player are in. please type ready to start the game"
+                sttatus = "wait for another player" if player_count == 1 else "both you and another player are in."
                 id = request.name + str(i)
                 symbol = self.player2_symbol if i == 0 else self.player1_symbol 
                 response = game_pb2.AccessResponse(id=id, symbol=symbol,game_status = sttatus)
                 players[i] = response.id
+                players_ingame[i] = True
                 print(f"{players[i]} has joined the game.")
 
 
@@ -121,27 +171,16 @@ class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
     def waiting_for_players(self):
         return (f"waiting for another player at port {first_port}")
  
-    # def start_game(self, request, context):
-    #         response = game_pb2.MessageResponse(board=game_board)
-    #         return response
-
-    def check_winner(self):
-        pass
-
     def broadcastMessage(self,request,context):
             for i in range(len(players)):
                 yield game_pb2.MessageResponse(message=f"{request.message} {i}")
                 time.sleep(1)
     
     def list_board0(self):
-        with grpc.insecure_channel(f'[::]:{first_port}') as channel:
-            stub = game_pb2_grpc.AdminServiceStub(channel)
-            response = stub.list_board(game_pb2.GameEmpty())
-            return response.message
+        print(printGameBoard())
 
     def list_board(self, request, context):
         return game_pb2.MessageResponse(message = printGameBoard())
-    
 admin = AdminServiceServicer()
 player = PlayerServiceServicer()
 

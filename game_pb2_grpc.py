@@ -14,8 +14,8 @@ class PlayerServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.player_request = channel.unary_unary(
-                '/tic_tac_toe.PlayerService/player_request',
+        self.restart = channel.unary_unary(
+                '/tic_tac_toe.PlayerService/restart',
                 request_serializer=game__pb2.AccessRequest.SerializeToString,
                 response_deserializer=game__pb2.AccessResponse.FromString,
                 )
@@ -44,7 +44,7 @@ class PlayerServiceStub(object):
 class PlayerServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def player_request(self, request, context):
+    def restart(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -77,8 +77,8 @@ class PlayerServiceServicer(object):
 
 def add_PlayerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'player_request': grpc.unary_unary_rpc_method_handler(
-                    servicer.player_request,
+            'restart': grpc.unary_unary_rpc_method_handler(
+                    servicer.restart,
                     request_deserializer=game__pb2.AccessRequest.FromString,
                     response_serializer=game__pb2.AccessResponse.SerializeToString,
             ),
@@ -113,7 +113,7 @@ class PlayerService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def player_request(request,
+    def restart(request,
             target,
             options=(),
             channel_credentials=None,
@@ -123,7 +123,7 @@ class PlayerService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.PlayerService/player_request',
+        return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.PlayerService/restart',
             game__pb2.AccessRequest.SerializeToString,
             game__pb2.AccessResponse.FromString,
             options, channel_credentials,

@@ -4,7 +4,7 @@ syntax = "proto3";
 package tic_tac_toe;
 
 service PlayerService {
-  rpc  player_request (AccessRequest) returns (AccessResponse) {}
+  rpc  restart (AccessRequest) returns (AccessResponse) {}
   rpc  check_status (GameEmpty) returns (MessageResponse) {}
   rpc  set_symbol (PlayerRequest) returns (PlayerResponse) {}
   rpc  access_to_server(AccessRequest) returns (AccessResponse) {}
