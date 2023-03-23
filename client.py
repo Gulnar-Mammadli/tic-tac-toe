@@ -47,17 +47,7 @@ class Client():
         request.position = int(pos)
         request.symbol = self.reg_symbol
         request.timestamp = self.reg_timestamp
-
-        start = time.time()
         response = self.stub1.set_symbol(request)
-        end = time.time()
-        difference = end - start
-        decision_time = int(difference)
-        if decision_time > 60:
-            response.symbol = ''
-            response.position = ''
-            response.game_board = ''
-
         self.found_winner = response.victory
         print(response.symbol)
         print(response.position)
@@ -81,7 +71,14 @@ class Client():
             #     return
             # else:
             #     print(self.found_winner + "found winner")
+            start = time.time()    
             cmd = input("Type your command to the game master: ")
+            end = time.time()
+            difference = end - start
+            decision_time = int(difference)
+            if decision_time > 60:
+                print("You took lots of time to decide.You lost your turn")
+                break
             if cmd == "quit":
                 self.logout()
                 sleep(1)
