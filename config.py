@@ -9,7 +9,7 @@ ip_address = socket.gethostbyname(hostname)
 print(f"Hostname: {hostname}")
 print(f"IP Address: {ip_address}")
 
-time_limit = 10
+time_limit = 60
 total_processes = 3
 ip = "172.80.0.1"
 first_port = 50051
