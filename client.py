@@ -28,6 +28,7 @@ class Client():
         self.reg_symbol = response.symbol
         print(f"your id: {response.id} symbol {response.symbol}")  # do something with the response object
         print(f"{response.game_status}")
+        self.is_your_turn = False
         return response
     
     def logout(self):
@@ -46,7 +47,7 @@ class Client():
         request = game_pb2.PlayerRequest()
         request.position = int(pos)
         request.symbol = self.reg_symbol
-        request.timestamp = diff
+        request.timestamp = str(diff)
         response = self.stub1.set_symbol(request)
         self.found_winner = response.victory
         print(response.symbol)
@@ -76,8 +77,9 @@ class Client():
             end = time.time()
             difference = end - start
             decision_time = int(difference)
-            if decision_time > 60:
+            if decision_time > time_limit:
                 print("You took lots of time to decide.You lost your turn")
+
             if cmd == "quit":
                 self.logout()
                 sleep(1)
@@ -93,7 +95,7 @@ class Client():
                 action = commands.get(cmd, lambda: print("No command found"))
                 action()
 
-        self.logout()
+        #self.logout()
 
     
 def list_tutorial():

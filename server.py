@@ -47,7 +47,7 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         sym = request.symbol
         timpstp = request.timestamp
 
-        if timpstp > 60:
+        if int(timpstp) > time_limit:
             pos = -2
             board = f"timeout" 
             self.current_turn = self.player2_symbol if self.current_turn == self.player1_symbol else self.player1_symbol
