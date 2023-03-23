@@ -1,0 +1,18 @@
+//python -m grpc_tools.protoc -I . --python_out=. --grpc_python_out=. berkeley.proto
+
+syntax = "proto3";
+
+service BerkeleySynchronization {
+    rpc RequestTime(Empty) returns (TimeResponse) {}
+    rpc AdjustTime(TimeAdjustment) returns (Empty) {}
+}
+
+message TimeResponse {
+    int64 time = 1;
+}
+
+message TimeAdjustment {
+    int64 adjustment = 1;
+}
+
+message Empty {}

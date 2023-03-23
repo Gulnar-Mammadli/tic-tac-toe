@@ -13,19 +13,19 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x62\x65rkeley.proto\x12\x0btic_tac_toe\"\x1c\n\x0cTimeResponse\x12\x0c\n\x04time\x18\x01 \x01(\x03\"$\n\x0eTimeAdjustment\x12\x12\n\nadjustment\x18\x01 \x01(\x03\"\x07\n\x05\x45mpty2\x9a\x01\n\x17\x42\x65rkeleySynchronization\x12>\n\x0bRequestTime\x12\x12.tic_tac_toe.Empty\x1a\x19.tic_tac_toe.TimeResponse\"\x00\x12?\n\nAdjustTime\x12\x1b.tic_tac_toe.TimeAdjustment\x1a\x12.tic_tac_toe.Empty\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x62\x65rkeley.proto\"\x1c\n\x0cTimeResponse\x12\x0c\n\x04time\x18\x01 \x01(\x03\"$\n\x0eTimeAdjustment\x12\x12\n\nadjustment\x18\x01 \x01(\x03\"\x07\n\x05\x45mpty2j\n\x17\x42\x65rkeleySynchronization\x12&\n\x0bRequestTime\x12\x06.Empty\x1a\r.TimeResponse\"\x00\x12\'\n\nAdjustTime\x12\x0f.TimeAdjustment\x1a\x06.Empty\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'berkeley_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _TIMERESPONSE._serialized_start=31
-  _TIMERESPONSE._serialized_end=59
-  _TIMEADJUSTMENT._serialized_start=61
-  _TIMEADJUSTMENT._serialized_end=97
-  _EMPTY._serialized_start=99
-  _EMPTY._serialized_end=106
-  _BERKELEYSYNCHRONIZATION._serialized_start=109
-  _BERKELEYSYNCHRONIZATION._serialized_end=263
+  _TIMERESPONSE._serialized_start=18
+  _TIMERESPONSE._serialized_end=46
+  _TIMEADJUSTMENT._serialized_start=48
+  _TIMEADJUSTMENT._serialized_end=84
+  _EMPTY._serialized_start=86
+  _EMPTY._serialized_end=93
+  _BERKELEYSYNCHRONIZATION._serialized_start=95
+  _BERKELEYSYNCHRONIZATION._serialized_end=201
 # @@protoc_insertion_point(module_scope)
