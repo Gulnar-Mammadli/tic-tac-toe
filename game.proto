@@ -5,6 +5,7 @@ package tic_tac_toe;
 
 service PlayerService {
   rpc  player_request (AccessRequest) returns (AccessResponse) {}
+  rpc  check_status (GameEmpty) returns (MessageResponse) {}
   rpc  set_symbol (PlayerRequest) returns (PlayerResponse) {}
   rpc  access_to_server(AccessRequest) returns (AccessResponse) {}
   rpc  logout(MessageRequest) returns(MessageResponse){}
@@ -51,6 +52,7 @@ message PlayerResponse {
     string symbol = 2;
     string timestamp = 3;
     string game_board = 4;
+    bool victory = 5;
 }
 
 service AdminService {
