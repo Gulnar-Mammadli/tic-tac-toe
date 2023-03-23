@@ -10,15 +10,18 @@ import time
 class Client():
 
     def __init__(self) -> None:
-        self.serverip = "localhost"  # input("paste ip here:")
         self.reg_name = input("put your name here:")
-        self.channel= grpc.insecure_channel(f'{self.serverip}:{first_port}')
-        self.stub1 = game_pb2_grpc.PlayerServiceStub(self.channel)
-        self.stub2 = game_pb2_grpc.AdminServiceStub(self.channel)
+        self.set_stub()
         self.reg_timestamp = str(datetime.datetime.now())
         self.total_processes = 3
         self.id = ""
         self.found_winner = False
+
+    def set_stub(self):
+        self.serverip = "localhost"  # input("paste ip here:")
+        self.channel= grpc.insecure_channel(f'{self.serverip}:{first_port}')
+        self.stub1 = game_pb2_grpc.PlayerServiceStub(self.channel)
+        self.stub2 = game_pb2_grpc.AdminServiceStub(self.channel)
 
     def access_to_server(self):
         request = game_pb2.AccessRequest()

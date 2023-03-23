@@ -41,7 +41,7 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         self.player1_symbol = 'X'
         self.player2_symbol = 'O'
         self.current_turn = self.player2_symbol
-        board =""
+        self.board =""
     def set_symbol(self, request, context):
         pos = 0
         sym = request.symbol
@@ -131,23 +131,14 @@ class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
     #         response = game_pb2.MessageResponse(board=game_board)
     #         return response
 
-    def check_winner(self):
-        pass
-
     def broadcastMessage(self,request,context):
             for i in range(len(players)):
                 yield game_pb2.MessageResponse(message=f"{request.message} {i}")
                 time.sleep(1)
     
     def list_board0(self):
-        with grpc.insecure_channel(f'[::]:{first_port}') as channel:
-            stub = game_pb2_grpc.AdminServiceStub(channel)
-            response = stub.list_board(game_pb2.GameEmpty())
-            return response.message
+        print(printGameBoard())
 
-    def list_board(self, request, context):
-        return game_pb2.MessageResponse(message = printGameBoard())
-    
 admin = AdminServiceServicer()
 player = PlayerServiceServicer()
 
