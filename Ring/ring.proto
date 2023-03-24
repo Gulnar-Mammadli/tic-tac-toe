@@ -4,10 +4,10 @@ syntax = "proto3";
 package tic_tac_toe;
 
 service RingElection {
-    rpc StartElection(Message) returns (Message) {}
+    rpc StartElection(RingMessage) returns (RingMessage) {}
 }
 
-message Message {
+message RingMessage {
     int32 origin = 1;
     int32 max_id = 2;
     int32 rounds = 3;
