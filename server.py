@@ -4,8 +4,8 @@ from concurrent import futures
 import game_pb2
 import game_pb2_grpc
 import time
-#import ringserver as ring
-#import Berkeley.berkeley_utils as brkl
+import Ring.ring_utils as rng
+import Berkeley.berkeley_utils as brkl
 
 players = [None] * 2
 players_ingame = [False] * 2
@@ -181,14 +181,22 @@ class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
 
     def list_board(self, request, context):
         return game_pb2.MessageResponse(message = printGameBoard())
+    
+
+
 admin = AdminServiceServicer()
 player = PlayerServiceServicer()
+server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
+port1, port2,address,next_node_address = "","",0,0
+
+def serve_ring():
+    ring = rng.RingElectionServicer(first_port)
+    rng.Ring.ring_pb2_grpc.add_RingElectionServicer_to_server(ring, server)
+    #ring.set_next_node()
 
 def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
     game_pb2_grpc.add_PlayerServiceServicer_to_server(player, server)
     game_pb2_grpc.add_AdminServiceServicer_to_server(admin, server)
-    server.add_insecure_port(f'[::]:{first_port}')
 
     # admin.waiting_for_players()
 
@@ -199,4 +207,11 @@ def serve():
     server.wait_for_termination()
 
 if __name__ == "__main__":
-        serve()
+    port1 = input("Please put your port id:")
+    port2 = int(port1) + 1 if int(port1) < first_port + total_processes - 1 else first_port
+    address = int(port1)
+    next_node_address = int(port2)
+    server.add_insecure_port(f'[::]:{address}')
+    serve_ring()
+    serve()
+
