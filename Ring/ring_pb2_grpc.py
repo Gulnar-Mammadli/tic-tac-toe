@@ -16,8 +16,8 @@ class RingElectionStub(object):
         """
         self.StartElection = channel.unary_unary(
                 '/tic_tac_toe.RingElection/StartElection',
-                request_serializer=ring__pb2.Message.SerializeToString,
-                response_deserializer=ring__pb2.Message.FromString,
+                request_serializer=ring__pb2.RingMessage.SerializeToString,
+                response_deserializer=ring__pb2.RingMessage.FromString,
                 )
 
 
@@ -35,8 +35,8 @@ def add_RingElectionServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'StartElection': grpc.unary_unary_rpc_method_handler(
                     servicer.StartElection,
-                    request_deserializer=ring__pb2.Message.FromString,
-                    response_serializer=ring__pb2.Message.SerializeToString,
+                    request_deserializer=ring__pb2.RingMessage.FromString,
+                    response_serializer=ring__pb2.RingMessage.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -60,7 +60,7 @@ class RingElection(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.RingElection/StartElection',
-            ring__pb2.Message.SerializeToString,
-            ring__pb2.Message.FromString,
+            ring__pb2.RingMessage.SerializeToString,
+            ring__pb2.RingMessage.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
