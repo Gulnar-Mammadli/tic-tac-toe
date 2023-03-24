@@ -163,6 +163,11 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         context.set_details('All players are already in.')
         context.set_code(grpc.StatusCode.UNAVAILABLE)
         return game_pb2.AccessResponse()
+    def leader_message(self, request, context):
+        with grpc.insecure_channel(f"localhost:{next_node_address}") as channel:
+            stub = rng.Ring.ring_pb2_grpc.RingElectionStub(channel)
+            response = stub.leader_message(request.message)
+            return response   
         
 class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
     def __init__(self) -> None:

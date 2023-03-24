@@ -5,6 +5,11 @@ package tic_tac_toe;
 
 service RingElection {
     rpc StartElection(RingMessage) returns (RingMessage) {}
+    rpc leader_message(LeaderMessage) returns (LeaderMessage){}
+}
+
+message LeaderMessage {
+    string message = 1;
 }
 
 message RingMessage {

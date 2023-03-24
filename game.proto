@@ -9,6 +9,7 @@ service PlayerService {
   rpc  set_symbol (PlayerRequest) returns (PlayerResponse) {}
   rpc  access_to_server(AccessRequest) returns (AccessResponse) {}
   rpc  logout(MessageRequest) returns(MessageResponse){}
+  rpc  leader_message(MessageRequest) returns(MessageResponse){}
 
 }
 

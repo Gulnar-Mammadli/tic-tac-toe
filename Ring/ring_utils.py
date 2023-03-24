@@ -45,3 +45,9 @@ class RingElectionServicer(Ring.ring_pb2_grpc.RingElectionServicer):
                 if self.next_node_address  == self.id:
                     print("All nodes seem to be down. Exiting.")
                     return
+    def leader_message(self):
+        while True:
+                with grpc.insecure_channel(f"localhost:{self.next_node_address}") as channel:
+                    stub = Ring.ring_pb2_grpc.RingElectionStub(channel)
+                    response = stub.leader_message(message=self.message)
+                    return response

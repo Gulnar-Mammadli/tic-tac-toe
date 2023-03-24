@@ -23,6 +23,16 @@ class Client():
         self.id = ""
         self.found_winner = False
 
+    def leader_message(self):
+        while(True):
+            ans = input("Type ring command to start leader election: ")
+            if ans=="ring":
+                leader = run_ring_election()
+                request = game_pb2.MessageRequest(message=str(leader))
+                response = self.stub1.leader_message(request)
+                return response
+            else:
+                break   
     def access_to_server(self):
         request = game_pb2.AccessRequest()
         request.name = self.reg_name
@@ -142,8 +152,8 @@ if __name__ == "__main__":
     a.list_board()
     list_tutorial()
     try:
-        run_ring_election()
-        #a.get_cmd()
+        a.leader_message()
+        a.get_cmd()
     except KeyboardInterrupt:
         print("you quit the game.")
         a.logout()
