@@ -5,30 +5,23 @@ import game_pb2_grpc
 import datetime
 from config import *
 import time 
-import os
 
-def clear_screen():
-    if os.name == 'nt':  # For Windows
-        os.system('cls')
-    else:  # For Unix-based systems (Linux, macOS)
-        os.system('clear')
+import Ring.ring_utils as rng
+import Berkeley.berkeley_utils as brkl
 
-#import Berkeley.berkeley_utils as brkl
 class Client():
 
     def __init__(self) -> None:
+        self.serverip = "localhost"  # input("paste ip here:")
         self.reg_name = input("put your name here:")
-        self.set_stub()
+        self.port = input("put your port here:")
+        self.channel= grpc.insecure_channel(f'{self.serverip}:{self.port}')
+        self.stub1 = game_pb2_grpc.PlayerServiceStub(self.channel)
+        self.stub2 = game_pb2_grpc.AdminServiceStub(self.channel)
         self.reg_timestamp = str(datetime.datetime.now())
         self.total_processes = 3
         self.id = ""
         self.found_winner = False
-        self.tie = False
-    def set_stub(self):
-        self.serverip = "localhost"  # input("paste ip here:")
-        self.channel= grpc.insecure_channel(f'{self.serverip}:{first_port}')
-        self.stub1 = game_pb2_grpc.PlayerServiceStub(self.channel)
-        self.stub2 = game_pb2_grpc.AdminServiceStub(self.channel)
 
     def access_to_server(self):
         request = game_pb2.AccessRequest()
@@ -38,7 +31,6 @@ class Client():
         self.reg_symbol = response.symbol
         print(f"your id: {response.id} symbol {response.symbol}")  # do something with the response object
         print(f"{response.game_status}")
-        print(self.id[-1])
         self.is_your_turn = False
         return response
     
@@ -56,7 +48,7 @@ class Client():
          
     def set_symbol(self, pos, diff):
         request = game_pb2.PlayerRequest()
-        request.position = int(pos[0])
+        request.position = int(pos)
         request.symbol = self.reg_symbol
         request.timestamp = str(diff)
         response = self.stub1.set_symbol(request)
@@ -64,8 +56,6 @@ class Client():
         print(response.symbol)
         print(response.position)
         print(response.game_board)
-        print(f"Victory: {response.victory}")
-        self.tie = response.symbol =="TIE!!"
 
 
 
@@ -79,42 +69,22 @@ class Client():
             print(f"{self.found_winner} found winner")
         else:
             print(f"{self.found_winner} no winner")
-            self.list_board()
         return self.found_winner
 
-    def restart(self):
-        self.found_winner = False
-        request = game_pb2.AccessRequest(name = self.id)
-        response = self.stub1.restart(request)
-        print(f"your id: {response.id} symbol {response.symbol}")  # do something with the response object
-        print(f"{response.game_status}")
-
-    def start_election(self):
-        print("start election")
-
-    def start_election(self):
-        print("start election")
-
-    def sync_time(self):
-        print("berkeley")
 
     def get_cmd(self):
-        global clear_screen
+
         commands = {
-        "ring": self.start_election,
-        "berkeley": self.sync_time , 
         "board": self.list_board,
         "status": lambda: self.check_status,
         "": lambda: self.list_board,
         "countdown": lambda: print("countdown time:"),
-        "cls" : lambda: clear_screen(),
         }
-
-
         while(True):
 
-            if (self.check_winner() or self.tie):
+            if (self.check_winner()):
                 break
+
             start = time.time()    
             cmd = input("Type your command to the game master: ")
             end = time.time()
@@ -127,22 +97,14 @@ class Client():
                 self.logout()
                 sleep(1)
                 break
-            elif len(cmd) > 0 and cmd[0].isdigit():
+            elif cmd[0].isdigit():
                 if (self.check_winner()):
-                    break
+                    return
                 self.set_symbol(cmd, decision_time)
             else:
                 action = commands.get(cmd, lambda: print("No command found"))
                 action()
 
-
-        restart = input("Do want to play Again?(y/n)")
-        if restart == "y" or restart == "Y": 
-            restartstr = input("please type ready to start the game:")
-            if restartstr.lower() == "ready":
-                self.restart()
-                self.get_cmd()
-        
         self.logout()
 
     
@@ -155,12 +117,24 @@ def list_tutorial():
     print("------3.1. ""board"" to see current game board")
     print("------3.2. ""status"" or just press enter to check if it is your turn")
     print("------3.3. ""countdown"" time left over in your turn")
-    print("------3.4. ""cls"" to clear the screen")
+    print("------3.4. ""quit"" to left the game")
     print("------3.5. ""quit"" to left the game")
     print("-----------------------------------------------")
 
+def run_ring_election():
+    origin = 50052#random.randint(first_port, first_port + total_processes - 1)
+    initial_message = rng.Ring.ring_pb2.RingMessage(
+        origin=origin, max_id=origin, rounds=0, leader=-1)
+    #brkl.print_with_berkeley_time(f"Starting election from node {origin}")
+    #try:
+    stub = rng.Ring.ring_pb2_grpc.RingElectionStub(a.channel)
+    response = stub.StartElection(initial_message)
+    # except grpc.RpcError as e:
+    #     print(f"Node {nodes_addresses[origin-first_port]} is down. Trying another node.")
+    #     return None
 
-
+    #brkl.print_with_berkeley_time(f"The elected leader is Node {response.leader}")
+    return response.leader
 
 if __name__ == "__main__": 
     a = Client()
@@ -168,7 +142,8 @@ if __name__ == "__main__":
     a.list_board()
     list_tutorial()
     try:
-        a.get_cmd()
+        run_ring_election()
+        #a.get_cmd()
     except KeyboardInterrupt:
         print("you quit the game.")
         a.logout()

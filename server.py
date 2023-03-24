@@ -189,10 +189,11 @@ player = PlayerServiceServicer()
 server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
 port1, port2,address,next_node_address = "","",0,0
 
+
 def serve_ring():
-    ring = rng.RingElectionServicer(first_port)
+    ring = rng.RingElectionServicer(address)
     rng.Ring.ring_pb2_grpc.add_RingElectionServicer_to_server(ring, server)
-    #ring.set_next_node()
+    ring.set_next_node(next_node_address)
 
 def serve():
     game_pb2_grpc.add_PlayerServiceServicer_to_server(player, server)
@@ -201,7 +202,7 @@ def serve():
     # admin.waiting_for_players()
 
     server.start()
-    print(f'Starting server. Listening on port {ip_address}:{first_port}.')
+    print(f'Starting server. Listening on port {ip_address}:{address}.')
     print(admin.list_board0())
 
     server.wait_for_termination()

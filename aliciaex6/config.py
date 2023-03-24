@@ -7,6 +7,7 @@ total_processes = 3
 first_port = 50051
 last_port = first_port + total_processes -1
 nodes_addresses = [first_port + i for i in range(total_processes)]
+port1, port2,address,next_node_address = "","",0,0
 
 # Increase the maximum metadata size
 options = [
