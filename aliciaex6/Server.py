@@ -76,21 +76,23 @@ class RingElectionServicer(alicia_pb2_grpc.RingElectionServicer):
             return message
         
 
-        while True:
-            try:
-                with grpc.insecure_channel(f"localhost:{self.next_node_address}") as channel:
-                    stub = alicia_pb2_grpc.RingElectionStub(channel)
-                    response = stub.StartElection(message)
-                    return response
-            except grpc.RpcError as e:
-                brkl.print_with_berkeley_time(f"Node {self.next_node_address} is down. We run localhost:{self.next_node_address+1} instead.")
-                self.next_node_address += 1
-                
-                if self.next_node_address  > first_port + total_processes - 1:
-                    self.next_node_address  = first_port
-                if self.next_node_address  == self.id:
-                    print("All nodes seem to be down. Exiting.")
-                    return
+        try:
+            with grpc.insecure_channel(f"localhost:{self.next_node_address}") as channel:
+                stub = alicia_pb2_grpc.RingElectionStub(channel)
+                response = stub.StartElection(message)
+                return response
+        except grpc.RpcError as e:
+            brkl.print_with_berkeley_time(f"Node {self.next_node_address} is down. We run localhost:{self.next_node_address+1} instead.")
+            self.next_node_address += 1
+            
+            if self.next_node_address  > first_port + total_processes - 1:
+                self.next_node_address  = first_port
+            if self.next_node_address  == self.id:
+                print("All nodes seem to be down. Exiting.")
+                return
+            
+    def BroadcastLeader(self, request, context):
+        pass
 
 class BerkeleySynchronizationServicer(alicia_pb2_grpc.BerkeleySynchronizationServicer):
     def __init__(self):

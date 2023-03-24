@@ -5,7 +5,7 @@ import berkeley_utils as brkl
 from config import *
 
 def run_ring_election(nodes_addresses):
-    origin = random.randint(first_port, first_port + total_processes - 1)
+    origin = 50051#random.randint(first_port, first_port + total_processes - 1)
     initial_message = alicia_pb2.Message(
         origin=origin, max_id=origin, rounds=0, leader=-1)
     brkl.print_with_berkeley_time(f"Starting election from node {origin}")

@@ -2,7 +2,7 @@ import grpc
 import alicia_pb2
 import alicia_pb2_grpc
 
-total_processes = 4
+total_processes = 3
 
 first_port = 50051
 last_port = first_port + total_processes -1
