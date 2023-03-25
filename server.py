@@ -10,8 +10,9 @@ import Berkeley.berkeley_pb2
 import Berkeley.berkeley_pb2_grpc
 import game_pb2_grpc
 
-players = [None] * 2
-players_ingame = [False] * 2
+#Index 0 is the game master
+players = [None] * 3
+players_ingame = [False] * 3
 player_count = 0
 
 game_board = {1: ' ' , 2: ' ' , 3: ' ' ,
@@ -51,14 +52,23 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         self.leader = 0
 
     def set_symbol(self, request, context):
-        pos = 0
+        pos = request.position
         sym = request.symbol
         timpstp = request.timestamp
 
+        print(f"pos: {pos}")
+        print(f"sym: {sym}")
+        print(f"timpstp: {timpstp}")
         if self.found_winner:
+            pos = -1
             print(f"{self.winner} won the game. Game Finished.")
+
+        if sym == "ADMIN":
+            pos = -10
+            board = f"You are the admin. You are not allowed to use this command."
+
         global players_ingame
-        if players_ingame[0] == False or players_ingame[1] == False:
+        if players_ingame[1] == False or players_ingame[2] == False:
             pos = -1
             board = f"wait for another player..."
         if int(timpstp) > time_limit:
@@ -87,7 +97,8 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
                     self.found_winner = True 
                     self.winner = request.symbol
                     sym = f"{request.symbol} WON!!"
-                    players_ingame= [False for _ in players_ingame]
+                    players_ingame[1]=False 
+                    players_ingame[2] = False
                 print(board)
             else:   
                 pos = -1
@@ -111,8 +122,8 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         self.counter = 0
         self.winner = ""
         global players_ingame
-        players_ingame[0] = False
         players_ingame[1] = False
+        players_ingame[2] = False
 
     def restart(self, request, context):
         self.reset_data()
@@ -121,7 +132,12 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         response = game_pb2.AccessResponse()
         response.id = request.name
         response.symbol = self.player2_symbol if request.name[-1] == "0" else self.player1_symbol
-        response.game_status = "wait for another player" if players_ingame[0] == True and players_ingame[1] == True else "both you and another player are in"
+        if players_ingame[0] == True:
+            if (players_ingame[1] == True and players_ingame[2] == False) or (players_ingame[1] == False and players_ingame[2] == True):
+                response.game_status = "wait for another player"
+            else:
+                response.game_status = "both you and another player are in"
+        #response.game_status = "wait for another player" if players_ingame[0] == True and (players_ingame[1] == True) else "both you and another player are in"
         print(f"{request.name} REQUESTS RESTART GAME")
         return response
     
@@ -154,9 +170,9 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
             if not players[i]:
                 global player_count
                 player_count += 1 
-                sttatus = "wait for another player" if player_count == 1 else "both you and another player are in."
-                id = request.name + str(i)
-                symbol = self.player2_symbol if i == 0 else self.player1_symbol 
+                sttatus = "you are the game master of your won server" if player_count == 1 else "wait for another player" if player_count == 2 else "both you and another player are in."
+                id = request.name + str(i) if i!=0 else "ADMIN" + str(i)
+                symbol = self.player2_symbol if i == 1 else self.player1_symbol if i == 2 else "ADMIN"
                 response = game_pb2.AccessResponse(id=id, symbol=symbol,game_status = sttatus)
                 players[i] = response.id
                 players_ingame[i] = True

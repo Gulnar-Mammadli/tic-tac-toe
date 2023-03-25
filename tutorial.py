@@ -23,3 +23,16 @@ def list_game_cmd():
     print("------3.4. ""cls"" to clear the screen")
     print("------3.5. ""quit"" to left the game")
     print("-----------------------------------------------")
+
+def list_ADMIN_cmd():
+    print("-------------------YOUR PRIVILEGES----------------------------")
+    print("How to use game master cmds: ")
+    print("1. you will be assigned the symbol from the game master.")
+    print("2. once it is your turn, just give the position at range 1-9.")
+    print("3. or type other command.")
+    print("------3.1. ""board"" to see current game board")
+    print("------3.2. ""status"" or just press enter to check if it is your turn")
+    print("------3.3. ""countdown"" time left over in your turn")
+    print("------3.4. ""cls"" to clear the screen")
+    print("------3.5. ""quit"" to left the game")
+    print("-----------------------------------------------")

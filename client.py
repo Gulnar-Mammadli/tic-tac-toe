@@ -51,8 +51,13 @@ class Client():
                 if self.leader != last_port:
                     print(f"{self.leader} : {last_port}")
                     print("leader not found. wait a bit until the election is finished.")
-                elif self.port == self.leader:
+                elif self.port == str(self.leader):
                     print("you are the game master") #TODO game master cmd
+                    list_ADMIN_cmd()
+                    break
+                elif self.port != str(self.leader):
+                    self.connect_to_leader()
+                    break
                 else:
                     break
         
@@ -94,7 +99,8 @@ class Client():
         response = self.stub1.set_symbol(request)
         self.found_winner = response.victory
         print(response.symbol)
-        print(response.position)
+        if hasattr(response, 'position'):
+            print(response.position)
         print(response.game_board)
         self.tie = response.symbol =="TIE!!"
 
@@ -161,7 +167,7 @@ class Client():
             restartstr = input("please type ready to start the game:")
             if restartstr.lower() == "ready":
                 self.restart()
-                self.get_cmd()
+                self.start_game()
 
         self.logout()
 
@@ -188,7 +194,6 @@ if __name__ == "__main__":
     list_tutorial()
     try:
         a.leader_message()
-        a.connect_to_leader()
         a.list_board()
         list_game_cmd()
         a.start_game()
