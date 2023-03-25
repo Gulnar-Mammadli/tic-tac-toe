@@ -17,13 +17,15 @@ def clear_screen():
         os.system('cls')
     else:  # For Unix-based systems (Linux, macOS)
         os.system('clear')
-        
-class Client():
 
+class Client():
     def __init__(self) -> None:
-        self.serverip = "localhost"  # input("paste ip here:")
-        self.reg_name = "alicia"#input("put your name here:")
+        self.reg_name = input("put your name here:")
         self.port = input("put your port here:")
+        self.init_client_data()
+
+    def init_client_data(self):
+        self.serverip = "localhost"  # input("paste ip here:")
         self.set_stub()
         self.reg_timestamp = str(datetime.datetime.now())
         self.id = ""
@@ -123,15 +125,10 @@ class Client():
         print(f"your id: {response.id} symbol {response.symbol}")  # do something with the response object
         print(f"{response.game_status}")
 
-    def sync_time(self):
-        print("berkeley")
-
     def start_game(self):
         global clear_screen
         commands = {
-        "ring": run_ring_election,
-        "berkeley": self.sync_time ,
-        "board": self.list_board,
+        "list-board": self.list_board,
         "status": lambda: self.check_status,
         "": lambda: self.list_board,
         "countdown": lambda: print("countdown time:"),
@@ -160,42 +157,106 @@ class Client():
         restart = input("Do want to play Again?(y/n)")
 
         if restart == "y" or restart == "Y": 
-            restartstr = input("please type ready to start the game:")
-            if restartstr.lower() == "ready":
+            restartstr = input("please type start-game to start the game:")
+            if restartstr.lower() == "start-game":
                 self.restart()
                 self.start_game()
 
         self.logout()
 
-a = Client()
-    
+class Admin(Client):
+
+    def __init__(self) -> None:
+        self.reg_name = c.reg_name
+        self.port =  c.port
+        self.init_client_data()
+
+    def init_client_data(self):
+        self.serverip = "localhost"  # input("paste ip here:")
+        self.set_stub(self.port)
+        self.reg_timestamp = str(datetime.datetime.now())
+        self.id = c.id 
+        self.leader = c.leader
+        self.found_winner = c.found_winner
+        self.tie = c.tie
+
+    def set_stub(self, port):
+        self.channel= grpc.insecure_channel(f'{self.serverip}:{port}')
+        self.stub1 = game_pb2_grpc.PlayerServiceStub(self.channel)
+        self.stub2 = game_pb2_grpc.AdminServiceStub(self.channel)
+        self.ringstub = rng.Ring.ring_pb2_grpc.RingElectionStub(self.channel)
+
+    def __init__(self):
+        self.reg_name = c.reg_name
+        self.port = c.port
+        c.init_client_data()
+
+
+    def admin_cmd(self):
+        global clear_screen
+        self.commands = {
+        "list-board": c.list_board,
+        "set-node-time": lambda: self.set_node_time(),
+        "set-timeout": lambda: self.set_timeout(),
+        "restart": lambda: c.restart(),
+        "": lambda: c.list_board,
+        "countdown": lambda: print("countdown time:"),
+        } 
+
+        while True:
+            cmd = input("Type your command: ")
+
+            if cmd == "quit":
+                print("Admin logout")
+                sleep(1)
+                break
+            else:
+                action = self.commands.get(cmd, lambda: print("No command found"))
+                action()
+
+    def restart_game():
+        pass
+    def set_node_time(self):
+        port = input("which port would you like to set node time:")
+        sec = input("which port would you like to set node time:")
+        #self.set_stub(port=port)
+        brkl.adjust_time_of_node(port,sec)
+        print("time adjusted")
+
+    def set_timeout(self):
+        timeout = input("how many seconds for timeout?:")
+        req = game_pb2.MessageRequest(message = timeout)
+        response = c.stub2.set_timeout(req)
+        print(f"set_timeout now: {response.message}")
+
+c = Client()
+a = None   
+
 def run_ring_election():
     origin = 50051
     initial_message = rng.Ring.ring_pb2.RingMessage(
         origin=origin, max_id=origin, rounds=0, leader=-1)
-    #brkl.print_with_berkeley_time(f"Starting election from node {origin}")
-    #try:
-
-    response = a.ringstub.StartElection(initial_message)
-    # except grpc.RpcError as e:
-    #     print(f"Node {nodes_addresses[origin-first_port]} is down. Trying another node.")
-    #     return None
-
-    #brkl.print_with_berkeley_time(f"The elected leader is Node {response.leader}")
+    response = c.ringstub.StartElection(initial_message)
     return response.leader
 
 
 if __name__ == "__main__": 
-    a.access_to_server()
+    c.access_to_server()
     list_tutorial()
     try:
-        a.leader_message()
-        a.list_board()
-        list_game_cmd()
-        a.start_game()
+        c.leader_message()
+        c.list_board()
+        if c.reg_symbol == "ADMIN":
+            a = Admin()
+            a.admin_cmd()
+        else:
+            list_game_cmd()
+            c.start_game()
     except KeyboardInterrupt:
         print("you quit the game.")
-        a.logout()
+        c.logout()
         sleep(1)
+    
+    c.logout()
 
 

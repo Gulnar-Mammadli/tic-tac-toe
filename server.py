@@ -195,13 +195,9 @@ class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
     def __init__(self) -> None:
         super().__init__()
 
-    def waiting_for_players(self):
-        return (f"waiting for another player at port {first_port}")
- 
-    def broadcastMessage(self,request,context):
-            for i in range(len(players)):
-                yield game_pb2.MessageResponse(message=f"{request.message} {i}")
-                time.sleep(1)
+    def set_timeout(self, request, context):
+        time_limit = int(request.message)
+        return game_pb2.MessageResponse(message = str(time_limit))
     
     def list_board0(self):
         print(printGameBoard())

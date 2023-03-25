@@ -250,6 +250,11 @@ class AdminServiceStub(object):
                 request_serializer=game__pb2.PlayerRequest.SerializeToString,
                 response_deserializer=game__pb2.PlayerResponse.FromString,
                 )
+        self.set_timeout = channel.unary_unary(
+                '/tic_tac_toe.AdminService/set_timeout',
+                request_serializer=game__pb2.MessageRequest.SerializeToString,
+                response_deserializer=game__pb2.MessageResponse.FromString,
+                )
         self.list_board = channel.unary_unary(
                 '/tic_tac_toe.AdminService/list_board',
                 request_serializer=game__pb2.GameEmpty.SerializeToString,
@@ -272,6 +277,12 @@ class AdminServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def start_game(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def set_timeout(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -301,6 +312,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     servicer.start_game,
                     request_deserializer=game__pb2.PlayerRequest.FromString,
                     response_serializer=game__pb2.PlayerResponse.SerializeToString,
+            ),
+            'set_timeout': grpc.unary_unary_rpc_method_handler(
+                    servicer.set_timeout,
+                    request_deserializer=game__pb2.MessageRequest.FromString,
+                    response_serializer=game__pb2.MessageResponse.SerializeToString,
             ),
             'list_board': grpc.unary_unary_rpc_method_handler(
                     servicer.list_board,
@@ -353,6 +369,23 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.AdminService/start_game',
             game__pb2.PlayerRequest.SerializeToString,
             game__pb2.PlayerResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def set_timeout(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.AdminService/set_timeout',
+            game__pb2.MessageRequest.SerializeToString,
+            game__pb2.MessageResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
