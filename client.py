@@ -8,7 +8,15 @@ import time
 
 import Ring.ring_utils as rng
 import Berkeley.berkeley_utils as brkl
+import time 
+import os
 
+def clear_screen():
+    if os.name == 'nt':  # For Windows
+        os.system('cls')
+    else:  # For Unix-based systems (Linux, macOS)
+        os.system('clear')
+        
 class Client():
 
     def __init__(self) -> None:
