@@ -80,12 +80,13 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
             pos = -1
             board = f"it's not your turn. please wait {sym}"
 
-
+        if self.counter >= 9:
+            self.found_winner = False 
+            sym = f"TIE!!"
+            pos = -1
+            board = printGameBoard()
         else:
-            if self.counter >= 9:
-                self.found_winner = False 
-                sym = f"TIE!!"
-                board = printGameBoard()
+
             global game_board
             if game_board[request.position] == ' ':
                 self.counter += 1
@@ -103,6 +104,7 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
             else:   
                 pos = -1
                 board = f"{request.position} is invalid position. use other number instead"
+        print(f"turn count:{self.counter}")
         response = game_pb2.PlayerResponse(position=pos, symbol=sym,timestamp = "", game_board =board, victory = self.found_winner)
         return response
     

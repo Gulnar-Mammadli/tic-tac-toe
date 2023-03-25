@@ -117,6 +117,7 @@ class Client():
 
     def restart(self):
         self.found_winner = False
+        self.tie = False
         request = game_pb2.AccessRequest(name = self.id)
         response = self.stub1.restart(request)
         print(f"your id: {response.id} symbol {response.symbol}")  # do something with the response object
@@ -136,11 +137,7 @@ class Client():
         "countdown": lambda: print("countdown time:"),
         }
 
-        while(True):
-
-            if (self.check_winner()):
-                break
-
+        while not self.check_winner() and not self.tie:
             start = time.time()    
             cmd = input("Type your command: ")
             end = time.time()
@@ -154,9 +151,8 @@ class Client():
                 sleep(1)
                 break
             elif len(cmd) > 0 and cmd[0].isdigit():
-                if (self.check_winner()):
-                    break
                 self.set_symbol(cmd, decision_time)
+
             else:
                 action = commands.get(cmd, lambda: print("No command found"))
                 action()
