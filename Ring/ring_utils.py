@@ -37,6 +37,7 @@ class RingElectionServicer(Ring.ring_pb2_grpc.RingElectionServicer):
                     stub = Ring.ring_pb2_grpc.RingElectionStub(channel)
                     response = stub.StartElection(message)
                     self.leader_port = response.leader #response only at 50051-50052 
+                    print(f"GRPC leader found: {response.leader}")
                     return response
             except grpc.RpcError as e:
                 brkl.print_with_berkeley_time(f"Node {self.next_node_address} is down. We run localhost:{self.next_node_address+1} instead.")
