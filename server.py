@@ -6,6 +6,9 @@ import game_pb2_grpc
 import time
 import Ring.ring_utils as rng
 import Berkeley.berkeley_utils as brkl
+import Berkeley.berkeley_pb2
+import Berkeley.berkeley_pb2_grpc
+import game_pb2_grpc
 
 players = [None] * 2
 players_ingame = [False] * 2
@@ -189,8 +192,19 @@ class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
     def list_board(self, request, context):
         return game_pb2.MessageResponse(message = printGameBoard())
     
+class BerkeleySynchronizationServicer(Berkeley.berkeley_pb2_grpc.BerkeleySynchronizationServicer):
+    def __init__(self):
+        self.current_time = time.time()
 
+    def RequestTime(self, request, context):
+        current_time = time.time()
+        return Berkeley.berkeley_pb2.TimeResponse(time=int(current_time))
 
+    def AdjustTime(self, request, context):
+        self.current_time += request.adjustment
+        return Berkeley.berkeley_pb2.Empty()
+
+sync = BerkeleySynchronizationServicer()
 admin = AdminServiceServicer()
 player = PlayerServiceServicer()
 server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
@@ -206,7 +220,7 @@ def serve_ring():
 def serve():
     game_pb2_grpc.add_PlayerServiceServicer_to_server(player, server)
     game_pb2_grpc.add_AdminServiceServicer_to_server(admin, server)
-
+    Berkeley.berkeley_pb2_grpc.add_BerkeleySynchronizationServicer_to_server(sync,server)
     server.start()
     print(f'Starting server. Listening on port {ip_address}:{address}.')
 
