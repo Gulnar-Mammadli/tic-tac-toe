@@ -12,12 +12,12 @@ class RingElectionServicer(Ring.ring_pb2_grpc.RingElectionServicer):
         self.next_node_address = int(next_node_address)
 
     def StartElection(self, request, context):
+        #sync time
         brkl.print_with_berkeley_time(f"Node {self.id} received message: {request}")
         message = Ring.ring_pb2.RingMessage()
         message.origin = request.origin
         message.rounds = request.rounds
         message.max_id = max(request.max_id, self.id)
-        brkl.print_with_berkeley_time(message.max_id)
 
         if request.origin == self.id and request.rounds == 1:
             message.leader = message.max_id

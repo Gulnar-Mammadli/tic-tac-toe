@@ -55,10 +55,12 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         sym = request.symbol
         timpstp = request.timestamp
 
+        if self.found_winner:
+            print(f"{self.winner} won the game. Game Finished.")
         global players_ingame
         if players_ingame[0] == False or players_ingame[1] == False:
             pos = -1
-            board = f"wait for another player"
+            board = f"wait for another player..."
         if int(timpstp) > time_limit:
             pos = -2
             board = f"timeout" 
@@ -67,6 +69,7 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         if(self.current_turn != sym):
             pos = -1
             board = f"it's not your turn. please wait {sym}"
+
 
         else:
             if self.counter >= 9:
@@ -90,8 +93,6 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
                 pos = -1
                 board = f"{request.position} is invalid position. use other number instead"
         response = game_pb2.PlayerResponse(position=pos, symbol=sym,timestamp = "", game_board =board, victory = self.found_winner)
-        
-
         return response
     
     def check_victory(self, player_symbol, pos):
@@ -160,8 +161,6 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
                 players[i] = response.id
                 players_ingame[i] = True
                 print(f"{players[i]} has joined the game.")
-
-
                 return response
         # If both player slots are filled, return an error response
         context.set_details('All players are already in.')
@@ -212,6 +211,7 @@ port1, port2,address,next_node_address = "","",0,0
 ring = None
 
 def serve_ring():
+    #Works when the program start only
     global ring
     ring = rng.RingElectionServicer(address)
     rng.Ring.ring_pb2_grpc.add_RingElectionServicer_to_server(ring, server)
