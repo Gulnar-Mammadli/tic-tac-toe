@@ -3,11 +3,14 @@ import game_pb2
 import game_pb2_grpc
 import socket
 
+your_selected_port = 50051
 hostname = socket.gethostname()
 ip_address = socket.gethostbyname(hostname)
 
 print(f"Hostname: {hostname}")
 print(f"IP Address: {ip_address}")
+nicknames = ["SiamSavage","PangPapaya","TheTeaThief","GanjaGandalf","BakuBrawler","KababKing","SabaSaber","ChaiChaos","GazelleGigolo","ThaiTsunami"]
+
 time_limit = 60
 total_processes = 3
 ip = "172.80.0.1"

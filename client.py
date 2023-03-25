@@ -6,7 +6,7 @@ import datetime
 from config import *
 from tutorial import *
 import time 
-
+import random
 import Ring.ring_utils as rng
 import Berkeley.berkeley_utils as brkl
 import time 
@@ -20,7 +20,7 @@ def clear_screen():
 
 class Client():
     def __init__(self) -> None:
-        self.reg_name = input("put your name here:")
+        self.reg_name = random.choice(nicknames)#input("put your name here:")
         self.port = input("put your port here:")
         self.init_client_data()
 
