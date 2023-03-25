@@ -245,6 +245,11 @@ class AdminServiceStub(object):
                 request_serializer=game__pb2.GameEmpty.SerializeToString,
                 response_deserializer=game__pb2.MessageResponse.FromString,
                 )
+        self.reset_data_call = channel.unary_unary(
+                '/tic_tac_toe.AdminService/reset_data_call',
+                request_serializer=game__pb2.GameEmpty.SerializeToString,
+                response_deserializer=game__pb2.MessageResponse.FromString,
+                )
         self.start_game = channel.unary_unary(
                 '/tic_tac_toe.AdminService/start_game',
                 request_serializer=game__pb2.PlayerRequest.SerializeToString,
@@ -271,6 +276,12 @@ class AdminServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def admin_request(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def reset_data_call(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -305,6 +316,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'admin_request': grpc.unary_unary_rpc_method_handler(
                     servicer.admin_request,
+                    request_deserializer=game__pb2.GameEmpty.FromString,
+                    response_serializer=game__pb2.MessageResponse.SerializeToString,
+            ),
+            'reset_data_call': grpc.unary_unary_rpc_method_handler(
+                    servicer.reset_data_call,
                     request_deserializer=game__pb2.GameEmpty.FromString,
                     response_serializer=game__pb2.MessageResponse.SerializeToString,
             ),
@@ -350,6 +366,23 @@ class AdminService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.AdminService/admin_request',
+            game__pb2.GameEmpty.SerializeToString,
+            game__pb2.MessageResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def reset_data_call(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.AdminService/reset_data_call',
             game__pb2.GameEmpty.SerializeToString,
             game__pb2.MessageResponse.FromString,
             options, channel_credentials,

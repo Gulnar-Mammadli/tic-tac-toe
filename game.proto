@@ -58,6 +58,7 @@ message PlayerResponse {
 
 service AdminService {
     rpc  admin_request (GameEmpty) returns (MessageResponse) {}
+    rpc  reset_data_call(GameEmpty) returns (MessageResponse) {}
     rpc  start_game (PlayerRequest) returns (PlayerResponse) {}
     rpc  set_timeout (MessageRequest) returns (MessageResponse) {}
     rpc  list_board (GameEmpty) returns (MessageResponse) {}

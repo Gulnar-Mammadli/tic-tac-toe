@@ -126,7 +126,9 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         global players_ingame
         players_ingame[1] = False
         players_ingame[2] = False
+    
 
+    
     def restart(self, request, context):
         self.reset_data()
         global players_ingame
@@ -198,6 +200,11 @@ class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
     def set_timeout(self, request, context):
         time_limit = int(request.message)
         return game_pb2.MessageResponse(message = str(time_limit))
+    
+    def reset_data_call(self, request, context):
+        player.reset_data()
+        response = game_pb2.MessageResponse(message = printGameBoard())
+        return response
     
     def list_board0(self):
         print(printGameBoard())

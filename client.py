@@ -121,6 +121,7 @@ class Client():
         self.found_winner = False
         self.tie = False
         request = game_pb2.AccessRequest(name = self.id)
+        print(self.id+" restart")
         response = self.stub1.restart(request)
         print(f"your id: {response.id} symbol {response.symbol}")  # do something with the response object
         print(f"{response.game_status}")
@@ -198,7 +199,7 @@ class Admin(Client):
         "list-board": c.list_board,
         "set-node-time": lambda: self.set_node_time(),
         "set-timeout": lambda: self.set_timeout(),
-        "restart": lambda: c.restart(),
+        "restart": lambda: self.restart_game(),
         "": lambda: c.list_board,
         "countdown": lambda: print("countdown time:"),
         } 
@@ -214,8 +215,14 @@ class Admin(Client):
                 action = self.commands.get(cmd, lambda: print("No command found"))
                 action()
 
-    def restart_game():
-        pass
+    def restart_game(self):
+        req = game_pb2.GameEmpty()
+        try: 
+            res = c.stub2.reset_data_call(req)
+            print(res.message)
+        except grpc.RpcError as e:
+            print("server shutdown.")
+            
     def set_node_time(self):
         port = input("which port would you like to set node time:")
         sec = input("which port would you like to set node time:")
