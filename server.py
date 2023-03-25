@@ -45,6 +45,7 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         self.found_winner = False
         self.counter = 0
         self.winner = ""
+        self.leader = 0
 
     def set_symbol(self, request, context):
         pos = 0
@@ -163,12 +164,13 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         context.set_details('All players are already in.')
         context.set_code(grpc.StatusCode.UNAVAILABLE)
         return game_pb2.AccessResponse()
+    
     def leader_message(self, request, context):
-        with grpc.insecure_channel(f"localhost:{next_node_address}") as channel:
-            stub = rng.Ring.ring_pb2_grpc.RingElectionStub(channel)
-            response = stub.leader_message(request.message)
-            return response   
-        
+        self.leader = int(request.message)
+        ring.leader_port = int(request.message)
+        response = game_pb2.MessageResponse(message = str(ring.leader_port))
+        return response
+    
 class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
     def __init__(self) -> None:
         super().__init__()
@@ -193,9 +195,10 @@ admin = AdminServiceServicer()
 player = PlayerServiceServicer()
 server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
 port1, port2,address,next_node_address = "","",0,0
-
+ring = None
 
 def serve_ring():
+    global ring
     ring = rng.RingElectionServicer(address)
     rng.Ring.ring_pb2_grpc.add_RingElectionServicer_to_server(ring, server)
     ring.set_next_node(next_node_address)
@@ -204,11 +207,8 @@ def serve():
     game_pb2_grpc.add_PlayerServiceServicer_to_server(player, server)
     game_pb2_grpc.add_AdminServiceServicer_to_server(admin, server)
 
-    # admin.waiting_for_players()
-
     server.start()
     print(f'Starting server. Listening on port {ip_address}:{address}.')
-    print(admin.list_board0())
 
     server.wait_for_termination()
 

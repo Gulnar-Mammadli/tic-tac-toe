@@ -13,26 +13,35 @@ class Client():
 
     def __init__(self) -> None:
         self.serverip = "localhost"  # input("paste ip here:")
-        self.reg_name = input("put your name here:")
+        self.reg_name = "alicia"#input("put your name here:")
         self.port = input("put your port here:")
         self.channel= grpc.insecure_channel(f'{self.serverip}:{self.port}')
         self.stub1 = game_pb2_grpc.PlayerServiceStub(self.channel)
         self.stub2 = game_pb2_grpc.AdminServiceStub(self.channel)
+        self.ringstub = rng.Ring.ring_pb2_grpc.RingElectionStub(self.channel)
+
         self.reg_timestamp = str(datetime.datetime.now())
         self.total_processes = 3
         self.id = ""
+        self.leader = 0
         self.found_winner = False
 
     def leader_message(self):
         while(True):
             ans = input("Type ring command to start leader election: ")
             if ans=="ring":
-                leader = run_ring_election()
-                request = game_pb2.MessageRequest(message=str(leader))
-                response = self.stub1.leader_message(request)
-                return response
+                self.leader = run_ring_election()
+                print(self.leader)
             else:
-                break   
+                request = game_pb2.MessageRequest(message = str(last_port))
+                response = self.stub1.leader_message(request)
+                self.leader = int(response.message)
+                if self.leader != last_port:
+                    print(f"{self.leader} : {last_port}")
+                    print("leader not found. wait a bit until the election is finished.")
+                else:
+                    break   
+
     def access_to_server(self):
         request = game_pb2.AccessRequest()
         request.name = self.reg_name
@@ -77,8 +86,6 @@ class Client():
     def check_winner(self):
         if self.found_winner == True:
             print(f"{self.found_winner} found winner")
-        else:
-            print(f"{self.found_winner} no winner")
         return self.found_winner
 
 
@@ -117,6 +124,7 @@ class Client():
 
         self.logout()
 
+a = Client()
     
 def list_tutorial():
     print("-----------------------------------------------")
@@ -132,13 +140,13 @@ def list_tutorial():
     print("-----------------------------------------------")
 
 def run_ring_election():
-    origin = 50052#random.randint(first_port, first_port + total_processes - 1)
+    origin = 50051
     initial_message = rng.Ring.ring_pb2.RingMessage(
         origin=origin, max_id=origin, rounds=0, leader=-1)
     #brkl.print_with_berkeley_time(f"Starting election from node {origin}")
     #try:
-    stub = rng.Ring.ring_pb2_grpc.RingElectionStub(a.channel)
-    response = stub.StartElection(initial_message)
+
+    response = a.ringstub.StartElection(initial_message)
     # except grpc.RpcError as e:
     #     print(f"Node {nodes_addresses[origin-first_port]} is down. Trying another node.")
     #     return None
@@ -146,8 +154,8 @@ def run_ring_election():
     #brkl.print_with_berkeley_time(f"The elected leader is Node {response.leader}")
     return response.leader
 
+
 if __name__ == "__main__": 
-    a = Client()
     a.access_to_server()
     a.list_board()
     list_tutorial()

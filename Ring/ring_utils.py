@@ -6,7 +6,7 @@ from config import *
 class RingElectionServicer(Ring.ring_pb2_grpc.RingElectionServicer):
     def __init__(self, id):
         self.id = int(id)
-
+        self.leader_port = int(id)
     def set_next_node(self, next_node_address):
         self.next_node_address = int(next_node_address)
 
@@ -18,23 +18,24 @@ class RingElectionServicer(Ring.ring_pb2_grpc.RingElectionServicer):
         message.max_id = max(request.max_id, self.id)
         #brkl.print_with_berkeley_time(message.max_id)
 
-        if request.origin == self.id and request.rounds == 1:
+        if request.origin == self.id and request.rounds == 1: #Found leader
             message.leader = message.max_id
             return message
         else:
             message.leader = message.max_id if message.max_id == self.id else -1
 
         if message.max_id == first_port + total_processes - 1: 
-            #this won't work if max port is down.
-            #also we should create cache to store the queue of nodes.
+            self.leader_port = message.leader
+            message.leader = message.max_id
+            print(f"leader found {message.leader}")
             return message
-        
 
         while True:
             try:
                 with grpc.insecure_channel(f"localhost:{self.next_node_address}") as channel:
                     stub = Ring.ring_pb2_grpc.RingElectionStub(channel)
                     response = stub.StartElection(message)
+                    self.leader_port = response.leader #response only at 50051-50052 
                     return response
             except grpc.RpcError as e:
                 #brkl.print_with_berkeley_time(f"Node {self.next_node_address} is down. We run localhost:{self.next_node_address+1} instead.")
@@ -45,9 +46,3 @@ class RingElectionServicer(Ring.ring_pb2_grpc.RingElectionServicer):
                 if self.next_node_address  == self.id:
                     print("All nodes seem to be down. Exiting.")
                     return
-    def leader_message(self):
-        while True:
-                with grpc.insecure_channel(f"localhost:{self.next_node_address}") as channel:
-                    stub = Ring.ring_pb2_grpc.RingElectionStub(channel)
-                    response = stub.leader_message(message=self.message)
-                    return response
