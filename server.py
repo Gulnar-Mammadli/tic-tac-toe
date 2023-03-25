@@ -4,8 +4,11 @@ from concurrent import futures
 import game_pb2
 import game_pb2_grpc
 import time
-#import ringserver as ring
-#import Berkeley.berkeley_utils as brkl
+import Ring.ring_utils as rng
+import Berkeley.berkeley_utils as brkl
+import Berkeley.berkeley_pb2
+import Berkeley.berkeley_pb2_grpc
+import game_pb2_grpc
 
 players = [None] * 2
 players_ingame = [False] * 2
@@ -45,6 +48,7 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         self.found_winner = False
         self.counter = 0
         self.winner = ""
+        self.leader = 0
 
     def set_symbol(self, request, context):
         pos = 0
@@ -163,7 +167,13 @@ class PlayerServiceServicer(game_pb2_grpc.PlayerServiceServicer):
         context.set_details('All players are already in.')
         context.set_code(grpc.StatusCode.UNAVAILABLE)
         return game_pb2.AccessResponse()
-        
+    
+    def leader_message(self, request, context):
+        self.leader = int(request.message)
+        ring.leader_port = int(request.message)
+        response = game_pb2.MessageResponse(message = str(ring.leader_port))
+        return response
+    
 class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
     def __init__(self) -> None:
         super().__init__()
@@ -181,22 +191,47 @@ class AdminServiceServicer(game_pb2_grpc.AdminServiceServicer):
 
     def list_board(self, request, context):
         return game_pb2.MessageResponse(message = printGameBoard())
+    
+class BerkeleySynchronizationServicer(Berkeley.berkeley_pb2_grpc.BerkeleySynchronizationServicer):
+    def __init__(self):
+        self.current_time = time.time()
+
+    def RequestTime(self, request, context):
+        current_time = time.time()
+        return Berkeley.berkeley_pb2.TimeResponse(time=int(current_time))
+
+    def AdjustTime(self, request, context):
+        self.current_time += request.adjustment
+        return Berkeley.berkeley_pb2.Empty()
+
+sync = BerkeleySynchronizationServicer()
 admin = AdminServiceServicer()
 player = PlayerServiceServicer()
+server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
+port1, port2,address,next_node_address = "","",0,0
+ring = None
+
+def serve_ring():
+    global ring
+    ring = rng.RingElectionServicer(address)
+    rng.Ring.ring_pb2_grpc.add_RingElectionServicer_to_server(ring, server)
+    ring.set_next_node(next_node_address)
 
 def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=5))
     game_pb2_grpc.add_PlayerServiceServicer_to_server(player, server)
     game_pb2_grpc.add_AdminServiceServicer_to_server(admin, server)
-    server.add_insecure_port(f'[::]:{first_port}')
-
-    # admin.waiting_for_players()
-
+    Berkeley.berkeley_pb2_grpc.add_BerkeleySynchronizationServicer_to_server(sync,server)
     server.start()
-    print(f'Starting server. Listening on port {ip_address}:{first_port}.')
-    print(admin.list_board0())
+    print(f'Starting server. Listening on port {ip_address}:{address}.')
 
     server.wait_for_termination()
 
 if __name__ == "__main__":
-        serve()
+    port1 = input("Please put your port id:")
+    port2 = int(port1) + 1 if int(port1) < first_port + total_processes - 1 else first_port
+    address = int(port1)
+    next_node_address = int(port2)
+    server.add_insecure_port(f'[::]:{address}')
+    serve_ring()
+    serve()
+

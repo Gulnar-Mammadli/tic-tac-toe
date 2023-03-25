@@ -16,8 +16,13 @@ class RingElectionStub(object):
         """
         self.StartElection = channel.unary_unary(
                 '/tic_tac_toe.RingElection/StartElection',
-                request_serializer=ring__pb2.Message.SerializeToString,
-                response_deserializer=ring__pb2.Message.FromString,
+                request_serializer=ring__pb2.RingMessage.SerializeToString,
+                response_deserializer=ring__pb2.RingMessage.FromString,
+                )
+        self.leader_message = channel.unary_unary(
+                '/tic_tac_toe.RingElection/leader_message',
+                request_serializer=ring__pb2.LeaderMessage.SerializeToString,
+                response_deserializer=ring__pb2.LeaderMessage.FromString,
                 )
 
 
@@ -30,13 +35,24 @@ class RingElectionServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def leader_message(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_RingElectionServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'StartElection': grpc.unary_unary_rpc_method_handler(
                     servicer.StartElection,
-                    request_deserializer=ring__pb2.Message.FromString,
-                    response_serializer=ring__pb2.Message.SerializeToString,
+                    request_deserializer=ring__pb2.RingMessage.FromString,
+                    response_serializer=ring__pb2.RingMessage.SerializeToString,
+            ),
+            'leader_message': grpc.unary_unary_rpc_method_handler(
+                    servicer.leader_message,
+                    request_deserializer=ring__pb2.LeaderMessage.FromString,
+                    response_serializer=ring__pb2.LeaderMessage.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -60,7 +76,24 @@ class RingElection(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.RingElection/StartElection',
-            ring__pb2.Message.SerializeToString,
-            ring__pb2.Message.FromString,
+            ring__pb2.RingMessage.SerializeToString,
+            ring__pb2.RingMessage.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def leader_message(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.RingElection/leader_message',
+            ring__pb2.LeaderMessage.SerializeToString,
+            ring__pb2.LeaderMessage.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

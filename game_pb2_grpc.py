@@ -39,6 +39,11 @@ class PlayerServiceStub(object):
                 request_serializer=game__pb2.MessageRequest.SerializeToString,
                 response_deserializer=game__pb2.MessageResponse.FromString,
                 )
+        self.leader_message = channel.unary_unary(
+                '/tic_tac_toe.PlayerService/leader_message',
+                request_serializer=game__pb2.MessageRequest.SerializeToString,
+                response_deserializer=game__pb2.MessageResponse.FromString,
+                )
 
 
 class PlayerServiceServicer(object):
@@ -74,6 +79,12 @@ class PlayerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def leader_message(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_PlayerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -99,6 +110,11 @@ def add_PlayerServiceServicer_to_server(servicer, server):
             ),
             'logout': grpc.unary_unary_rpc_method_handler(
                     servicer.logout,
+                    request_deserializer=game__pb2.MessageRequest.FromString,
+                    response_serializer=game__pb2.MessageResponse.SerializeToString,
+            ),
+            'leader_message': grpc.unary_unary_rpc_method_handler(
+                    servicer.leader_message,
                     request_deserializer=game__pb2.MessageRequest.FromString,
                     response_serializer=game__pb2.MessageResponse.SerializeToString,
             ),
@@ -192,6 +208,23 @@ class PlayerService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.PlayerService/logout',
+            game__pb2.MessageRequest.SerializeToString,
+            game__pb2.MessageResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def leader_message(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/tic_tac_toe.PlayerService/leader_message',
             game__pb2.MessageRequest.SerializeToString,
             game__pb2.MessageResponse.FromString,
             options, channel_credentials,
