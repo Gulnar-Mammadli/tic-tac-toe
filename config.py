@@ -7,13 +7,23 @@ your_selected_port = 50051
 hostname = socket.gethostname()
 ip_address = socket.gethostbyname(hostname)
 
+ips = ["192.168.246.123","172.31.169.211","192.168.246.190"] #alicia's window, alicia's linux, alicia's phone
 print(f"Hostname: {hostname}")
 print(f"IP Address: {ip_address}")
 nicknames = ["SiamSavage","PangPapaya","TheTeaThief","GanjaGandalf","BakuBrawler","KababKing","SabaSaber","ChaiChaos","GazelleGigolo","ThaiTsunami"]
 
+
+def ip(address):
+    if address == nodes_addresses[0]:
+        return ips[0]
+    elif address == nodes_addresses[1]:
+        return ips[1]
+    else:
+        return ips[2]
+
 time_limit = 60
 total_processes = 3
-ip = "192.168.246.123"
+
 first_port = 50051
 last_port = first_port + total_processes -1
 nodes_addresses = [first_port + i for i in range(total_processes)]

@@ -33,7 +33,7 @@ class RingElectionServicer(Ring.ring_pb2_grpc.RingElectionServicer):
 
         while True:
             try:
-                with grpc.insecure_channel(f"{ip}:{self.next_node_address}") as channel:
+                with grpc.insecure_channel(f"{ip(self.next_node_address)}:{self.next_node_address}") as channel:
                     stub = Ring.ring_pb2_grpc.RingElectionStub(channel)
                     response = stub.StartElection(message)
                     self.leader_port = response.leader #response only at 50051-50052 

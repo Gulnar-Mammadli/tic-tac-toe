@@ -25,7 +25,7 @@ class Client():
         self.init_client_data()
 
     def init_client_data(self):
-        self.serverip = ip  # input("paste ip here:")
+        self.serverip = ip(int(self.port))  # input("paste ip here:")
         self.set_stub()
         self.reg_timestamp = str(datetime.datetime.now())
         self.id = ""

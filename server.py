@@ -252,7 +252,7 @@ if __name__ == "__main__":
     port2 = int(port1) + 1 if int(port1) < first_port + total_processes - 1 else first_port
     address = int(port1)
     next_node_address = int(port2)
-    server.add_insecure_port(f'{ip}:{address}')
+    server.add_insecure_port(f'{ip(address)}:{address}')
     serve_ring()
     serve()
 

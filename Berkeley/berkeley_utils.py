@@ -33,7 +33,7 @@ def synchronize_time(nodes_addresses):
 
 def request_time_from_node(node_address):
     try:
-        with grpc.insecure_channel(f"{ip}:{node_address}") as channel:
+        with grpc.insecure_channel(f"{ip(node_address)}:{node_address}") as channel:
             stub = Berkeley.berkeley_pb2_grpc.BerkeleySynchronizationStub(channel)
             response = stub.RequestTime(Berkeley.berkeley_pb2.Empty())
             node_time = response.time
@@ -47,7 +47,7 @@ def request_time_from_node(node_address):
 
 def adjust_time_of_node(node_address, adjustment):
     try:
-        with grpc.insecure_channel(f"{ip}:{node_address}") as channel:
+        with grpc.insecure_channel(f"{ip(node_address)}:{node_address}") as channel:
             stub = Berkeley.berkeley_pb2_grpc.BerkeleySynchronizationStub(channel)
             request = Berkeley.berkeley_pb2.TimeAdjustment(adjustment=int(adjustment))
             stub.AdjustTime(request)
