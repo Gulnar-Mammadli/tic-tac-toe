@@ -34,7 +34,7 @@ class Client():
         self.tie = False
 
     def set_stub(self):
-        self.channel= grpc.insecure_channel(f'{ip(self.next_node_address)}:{self.port}')
+        self.channel= grpc.insecure_channel(f'{ip(self.serverip)}:{self.port}')
         self.stub1 = game_pb2_grpc.PlayerServiceStub(self.channel)
         self.stub2 = game_pb2_grpc.AdminServiceStub(self.channel)
         self.ringstub = rng.Ring.ring_pb2_grpc.RingElectionStub(self.channel)
