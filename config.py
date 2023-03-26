@@ -7,7 +7,7 @@ your_selected_port = 50051
 hostname = socket.gethostname()
 ip_address = socket.gethostbyname(hostname)
 
-ips = ["192.168.246.98","192.168.246.98","192.168.246.197"] #gulnars, gandab window, ...,alicia's linux
+ips = ["192.168.246.98","192.168.246.148","192.168.246.197"] #gulnars, gandab window, ...,alicia's linux
 print(f"Hostname: {hostname}")
 print(f"IP Address: {ip_address}")
 nicknames = ["SiamSavage","PangPapaya","TheTeaThief","GanjaGandalf","BakuBrawler","KababKing","SabaSaber","ChaiChaos","GazelleGigolo","ThaiTsunami"]
