@@ -13,7 +13,7 @@ nicknames = ["SiamSavage","PangPapaya","TheTeaThief","GanjaGandalf","BakuBrawler
 
 time_limit = 60
 total_processes = 3
-ip = "172.80.0.1"
+ip = "192.168.246.123"
 first_port = 50051
 last_port = first_port + total_processes -1
 nodes_addresses = [first_port + i for i in range(total_processes)]

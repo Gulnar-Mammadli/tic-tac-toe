@@ -25,7 +25,7 @@ class Client():
         self.init_client_data()
 
     def init_client_data(self):
-        self.serverip = "localhost"  # input("paste ip here:")
+        self.serverip = ip  # input("paste ip here:")
         self.set_stub()
         self.reg_timestamp = str(datetime.datetime.now())
         self.id = ""
@@ -222,7 +222,7 @@ class Admin(Client):
             print(res.message)
         except grpc.RpcError as e:
             print("server shutdown.")
-            
+
     def set_node_time(self):
         port = input("which port would you like to set node time:")
         sec = input("which port would you like to set node time:")
